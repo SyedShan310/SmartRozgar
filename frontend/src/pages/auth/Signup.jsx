@@ -4,7 +4,6 @@ import {
   ChevronRight, Check, MapPin, AlertCircle, Loader2, ShieldCheck 
 } from 'lucide-react';
 import Lottie from 'lottie-react';
-import Logo from '/images/logo2.png';
 import { axiosInstance } from '../../lib/axios';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -100,91 +99,95 @@ export default function Signup() {
   };
 
   return (
-    /* FIX 1: Use 'fixed inset-0' and 'h-[100dvh]' to lock the page to the viewport */
-    <div className="bg-[#050505] fixed inset-0 h-[100dvh] w-full flex items-center justify-center p-4 font-['Inter'] overflow-hidden">
+    <div className="bg-[#F8FAFC] fixed inset-0 h-[100dvh] w-full flex items-center justify-center p-4 font-['Inter'] overflow-hidden">
       
-      {/* Background Glow */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#00D1D1]/5 blur-[120px] rounded-full"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#00D1D1]/5 blur-[120px] rounded-full"></div>
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+           style={{ backgroundImage: `radial-gradient(#0D9488 1px, transparent 1px)`, backgroundSize: '30px 30px' }}>
       </div>
 
       {loading && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="text-center">
-            <Loader2 className="w-12 h-12 text-[#00D1D1] animate-spin mx-auto mb-4" />
-            <p className="text-[#00D1D1] font-bold">Creating your SmartRozgar account...</p>
+            <Loader2 className="w-12 h-12 text-[#0D9488] animate-spin mx-auto mb-4" />
+            <p className="text-[#0D9488] font-black uppercase text-xs tracking-widest">Processing Registration...</p>
           </div>
         </div>
       )}
 
-      {/* FIX 2: Height limited to 90% of viewport to ensure card stays within bounds */}
-      <div className="max-w-6xl w-full bg-[#0A0A0A] border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden relative z-10 flex flex-col lg:flex-row h-full max-h-[90dvh] lg:h-[750px]">
+      {/* Main Card */}
+      <div className="max-w-6xl w-full bg-white border border-slate-200 rounded-[2.5rem] shadow-2xl overflow-hidden relative z-10 flex flex-col lg:flex-row h-full max-h-[90dvh] lg:h-[750px]">
         
-        {/* LEFT PANEL: Branding */}
-        <div className="hidden lg:flex lg:w-2/5 bg-[#0D0D0D] p-12 flex-col justify-between border-r border-white/5 relative">
-          <div>
-            <div className="flex items-center gap-2 text-[#00D1D1] mb-6 font-bold text-xs uppercase tracking-widest">
-              <ShieldCheck size={16} /> Join SmartRozgar
+        {/* LEFT PANEL: Branding (Teal Background) */}
+        <div className="hidden lg:flex lg:w-2/5 bg-[#0D9488] p-12 flex-col justify-between relative overflow-hidden">
+          <div className="absolute top-[-5%] right-[-5%] w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 text-teal-100 mb-6 font-bold text-[10px] uppercase tracking-widest">
+              <ShieldCheck size={16} /> Secure Registration
             </div>
-            <h3 className="text-4xl font-black text-white leading-tight">
+            <h3 className="text-4xl font-extrabold text-white leading-tight tracking-tight">
               Start your <br />
-              <span className="text-[#00D1D1]">Journey</span> with us
+              <span className="text-teal-200">Professional</span> <br />
+              Journey.
             </h3>
-            <p className="text-gray-400 text-sm mt-4 leading-relaxed">
-              The easiest way to find skilled help or offer your professional services.
+            <p className="text-teal-50/80 text-sm mt-4 leading-relaxed font-medium">
+              Join thousands of professionals and homeowners across Pakistan today.
             </p>
           </div>
 
-          <div className="py-4">
-            {animationData && <Lottie animationData={animationData} loop={true} className="w-full max-w-[280px] mx-auto opacity-80" />}
+          <div className="py-4 relative z-10">
+            {animationData && <Lottie animationData={animationData} loop={true} className="w-full max-w-[280px] mx-auto" />}
           </div>
 
-          <div className="text-xs text-gray-600 font-bold uppercase tracking-widest">
-            Safe • Secure • Reliable
+          <div className="text-[10px] text-teal-100/60 font-bold uppercase tracking-[0.2em] relative z-10">
+             Reliable • Efficient • Local
           </div>
         </div>
 
-        {/* RIGHT PANEL: Form */}
-        <div className="flex-1 p-6 lg:p-12 flex flex-col bg-black/40 backdrop-blur-xl overflow-hidden">
+        {/* RIGHT PANEL: Form (White Background) */}
+        <div className="flex-1 p-6 lg:p-12 flex flex-col bg-white overflow-hidden">
           <div className="max-w-xl mx-auto w-full h-full flex flex-col">
             
-            {/* Header */}
+            {/* Header with Text Logo */}
             <div className="flex justify-between items-center mb-8 shrink-0">
               <div className="flex flex-col">
-                <span className="text-white font-black text-xl tracking-tighter">Smart<span className="text-[#00D1D1]">Rozgar</span></span>
-                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Sign Up</span>
+                <div className="text-xl font-black tracking-tighter flex items-center">
+                  <span className="text-slate-900">Smart</span>
+                  <span className="text-[#0D9488]">Rozgar</span>
+                </div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Step {step} of 3</span>
               </div>
               <div className="flex gap-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className={`h-1.5 w-6 rounded-full transition-all ${step >= i ? 'bg-[#00D1D1]' : 'bg-white/10'}`} />
+                  <div key={i} className={`h-1.5 w-6 rounded-full transition-all ${step >= i ? 'bg-[#0D9488]' : 'bg-slate-100'}`} />
                 ))}
               </div>
             </div>
 
-            {/* FIX 3: This is the ONLY area allowed to scroll. Added custom scrollbar classes */}
-            <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#00D1D1]/20 scrollbar-track-transparent">
+            {/* Scrollable Form Content */}
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
               
               {/* STEP 1: SELECT ROLE */}
               {step === 1 && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-4">
                   <div>
-                    <h2 className="text-2xl font-black text-white">Choose your account type</h2>
-                    <p className="text-gray-400 text-sm mt-1">How do you want to use SmartRozgar?</p>
+                    <h2 className="text-2xl font-black text-slate-800">Choose account type</h2>
+                    <p className="text-slate-500 text-sm mt-1">Select how you want to use the platform.</p>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button onClick={() => { setRole('hirer'); nextStep(); }}
-                      className="p-8 bg-white/5 border border-white/10 rounded-[2rem] hover:border-[#00D1D1] transition-all text-left group">
-                      <Home size={32} className="text-[#00D1D1] mb-4" />
-                      <h3 className="text-white font-bold text-lg">I want to Hire</h3>
-                      <p className="text-gray-500 text-xs mt-1">I am looking for someone to help with tasks.</p>
+                      className="p-8 bg-slate-50 border border-slate-200 rounded-[2rem] hover:border-[#0D9488] hover:bg-teal-50/30 transition-all text-left group">
+                      <Home size={32} className="text-[#0D9488] mb-4" />
+                      <h3 className="text-slate-800 font-bold text-lg leading-none">I want to Hire</h3>
+                      <p className="text-slate-500 text-xs mt-2">Find skilled professionals for your home tasks.</p>
                     </button>
                     
                     <button onClick={() => { setRole('tasker'); nextStep(); }}
-                      className="p-8 bg-white/5 border border-white/10 rounded-[2rem] hover:border-[#00D1D1] transition-all text-left group">
-                      <Briefcase size={32} className="text-[#00D1D1] mb-4" />
-                      <h3 className="text-white font-bold text-lg">I want to Work</h3>
-                      <p className="text-gray-500 text-xs mt-1">I want to offer my services and earn money.</p>
+                      className="p-8 bg-slate-50 border border-slate-200 rounded-[2rem] hover:border-[#0D9488] hover:bg-teal-50/30 transition-all text-left group">
+                      <Briefcase size={32} className="text-[#0D9488] mb-4" />
+                      <h3 className="text-slate-800 font-bold text-lg leading-none">I want to Work</h3>
+                      <p className="text-slate-500 text-xs mt-2">Offer your skills and grow your business.</p>
                     </button>
                   </div>
                 </div>
@@ -192,52 +195,51 @@ export default function Signup() {
 
               {/* STEP 2: PERSONAL INFO */}
               {step === 2 && (
-                <div className="space-y-5 animate-in fade-in slide-in-from-right-4 pb-4">
-                  <h2 className="text-xl font-bold text-white">Personal Details</h2>
+                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 pb-4">
+                  <h2 className="text-xl font-bold text-slate-800">Profile Details</h2>
                   
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 ml-1">Full Name</label>
-                      <input name="fullName" value={formData.fullName} onChange={handleChange} placeholder="John Doe" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-[#00D1D1] outline-none" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Full Name</label>
+                      <input name="fullName" value={formData.fullName} onChange={handleChange} placeholder="John Doe" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all" />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 ml-1">Gender</label>
-                      <select name="gender" value={formData.gender} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-[#00D1D1] outline-none">
-                        <option value="">Select</option>
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Gender</label>
+                      <select name="gender" value={formData.gender} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all">
+                        <option value="">Select Gender</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
-                        <option value="other">Other</option>
                       </select>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 ml-1">Phone Number</label>
-                      <input name="phone" value={formData.phone} onChange={handleChange} placeholder="0300 1234567" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-[#00D1D1] outline-none" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Phone Number</label>
+                      <input name="phone" value={formData.phone} onChange={handleChange} placeholder="0300 1234567" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all" />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 ml-1">Email (Optional)</label>
-                      <input name="email" value={formData.email} onChange={handleChange} placeholder="mail@example.com" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-[#00D1D1] outline-none" />
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Email (Optional)</label>
+                      <input name="email" value={formData.email} onChange={handleChange} placeholder="mail@example.com" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all" />
                     </div>
                   </div>
 
-                  <div className="p-4 bg-white/5 rounded-2xl space-y-3">
-                    <label className="text-xs font-bold text-[#00D1D1] uppercase tracking-widest">Address</label>
+                  <div className="p-5 bg-teal-50/30 rounded-2xl border border-teal-100 space-y-4">
+                    <label className="text-[11px] font-black text-[#0D9488] uppercase tracking-widest">Service Location</label>
                     <div className="grid grid-cols-2 gap-3">
-                      <input name="city" value={formData.city} onChange={handleChange} placeholder="City" className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-[#00D1D1]" />
-                      <input name="pincode" value={formData.pincode} onChange={handleChange} placeholder="Pincode" className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-[#00D1D1]" />
+                      <input name="city" value={formData.city} onChange={handleChange} placeholder="City" className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-slate-900 text-sm outline-none focus:border-[#0D9488]" />
+                      <input name="pincode" value={formData.pincode} onChange={handleChange} placeholder="Pincode" className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-slate-900 text-sm outline-none focus:border-[#0D9488]" />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 ml-1">Password</label>
-                      <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-[#00D1D1] outline-none" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Password</label>
+                      <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all" />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 ml-1">Confirm Password</label>
-                      <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-[#00D1D1] outline-none" />
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Confirm</label>
+                      <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all" />
                     </div>
                   </div>
                 </div>
@@ -246,17 +248,17 @@ export default function Signup() {
               {/* STEP 3: WORK DETAILS */}
               {step === 3 && (
                 <div className="space-y-6 animate-in zoom-in-95 duration-500 pb-4">
-                  <h2 className="text-xl font-bold text-white">Final Steps</h2>
+                  <h2 className="text-xl font-bold text-slate-800">Final Confirmation</h2>
                   
                   {role === 'tasker' ? (
                     <div className="space-y-6">
                       <div className="space-y-3">
-                        <label className="text-xs font-bold text-gray-400 ml-1">Select your Skills</label>
-                        <div className="grid grid-cols-2 gap-2">
+                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Expertise (Select multiple)</label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                           {skillsOptions.map(skill => (
                             <button key={skill} onClick={() => handleSkillToggle(skill)}
-                              className={`py-3 rounded-xl border text-xs font-bold transition-all ${
-                                formData.skills.includes(skill) ? 'bg-[#00D1D1] border-[#00D1D1] text-black shadow-lg' : 'bg-white/5 border-white/10 text-gray-500'
+                              className={`py-3 rounded-xl border text-[11px] font-bold transition-all ${
+                                formData.skills.includes(skill) ? 'bg-[#0D9488] border-[#0D9488] text-white shadow-md' : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-teal-200'
                               }`}>
                               {skill}
                             </button>
@@ -264,55 +266,71 @@ export default function Signup() {
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 ml-1">Your Hourly Rate (PKR)</label>
-                        <input type="number" name="hourlyRate" value={formData.hourlyRate} onChange={handleChange} placeholder="e.g. 500" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white text-sm focus:border-[#00D1D1] outline-none" />
+                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Expected Hourly Rate (PKR)</label>
+                        <input type="number" name="hourlyRate" value={formData.hourlyRate} onChange={handleChange} placeholder="e.g. 800" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none" />
                       </div>
                     </div>
                   ) : (
-                    <div className="py-12 text-center bg-white/5 rounded-[2rem] border border-white/10">
-                      <div className="w-16 h-16 bg-[#00D1D1]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                         <Check size={32} className="text-[#00D1D1]" />
+                    <div className="py-12 text-center bg-teal-50/30 rounded-[2.5rem] border border-teal-100">
+                      <div className="w-16 h-16 bg-[#0D9488] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-teal-200">
+                         <Check size={32} className="text-white" />
                       </div>
-                      <h4 className="text-white font-bold">You're all set!</h4>
-                      <p className="text-gray-400 text-xs px-10 mt-2">Click below to finish and start finding the best help for your home.</p>
+                      <h4 className="text-slate-800 font-black text-lg">Account Ready!</h4>
+                      <p className="text-slate-500 text-xs px-10 mt-2 font-medium">Click create account to start finding the best professionals in your area.</p>
                     </div>
                   )}
                 </div>
               )}
             </div>
 
-            {/* BUTTONS (Fixed at bottom of right panel) */}
-            <div className="mt-auto pt-6 border-t border-white/5 shrink-0">
+            {/* ACTION BUTTONS */}
+            <div className="mt-auto pt-6 border-t border-slate-100 shrink-0">
               <div className="flex gap-4">
                 {step > 1 && (
-                  <button onClick={prevStep} className="flex-1 py-4 border border-white/10 rounded-2xl text-gray-400 font-bold text-xs uppercase hover:bg-white/5">
+                  <button onClick={prevStep} className="flex-1 py-4 border border-slate-200 rounded-2xl text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:bg-slate-50 transition-all">
                     Back
                   </button>
                 )}
                 {step < 3 ? (
-                  <button onClick={nextStep} className="flex-[2] py-4 bg-[#00D1D1] hover:bg-[#00f2f2] text-black font-black rounded-2xl text-xs uppercase flex items-center justify-center gap-2">
-                    Continue <ChevronRight size={14} />
+                  <button onClick={nextStep} className="flex-[2] py-4 bg-[#0D9488] hover:bg-[#0b7a70] text-white font-black rounded-2xl text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-teal-900/10">
+                    Next Step <ChevronRight size={16} />
                   </button>
                 ) : (
-                  <button onClick={handleSubmit} className="flex-[2] py-4 bg-[#00D1D1] hover:bg-[#00f2f2] text-black font-black rounded-2xl text-xs uppercase shadow-lg">
+                  <button onClick={handleSubmit} className="flex-[2] py-4 bg-[#0D9488] hover:bg-[#0b7a70] text-white font-black rounded-2xl text-[11px] uppercase tracking-widest shadow-lg shadow-teal-900/10">
                     Create My Account
                   </button>
                 )}
               </div>
 
               {message && (
-                <div className={`mt-4 p-3 rounded-xl text-xs font-bold text-center border ${messageType === 'success' ? 'border-[#00D1D1] text-[#00D1D1]' : 'border-red-500/50 text-red-400'}`}>
+                <div className={`mt-4 p-3 rounded-xl text-xs font-bold text-center border ${messageType === 'success' ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-red-50 border-red-100 text-red-600'}`}>
                   {message}
                 </div>
               )}
 
-              <p className="text-center mt-6 text-gray-600 text-xs">
-                Already have an account? <Link to="/login" className="text-[#00D1D1] font-bold">Login here</Link>
+              <p className="text-center mt-6 text-slate-400 text-[11px] font-bold uppercase tracking-tight">
+                Already part of the network? <Link to="/login" className="text-[#0D9488] hover:underline underline-offset-4 ml-1">Login here</Link>
               </p>
             </div>
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #E2E8F0;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #0D9488;
+        }
+      `}</style>
     </div>
   );
 }

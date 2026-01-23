@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Send, Paperclip, MoreVertical, Search, ArrowLeft, 
-  CheckCheck, Smile, Phone, Video 
+  CheckCheck, Smile, Phone, Video, ShieldCheck
 } from 'lucide-react';
 
 const ChatPage = () => {
@@ -19,9 +19,10 @@ const ChatPage = () => {
       fullName: "Ahmad Hassan",
       image: "https://i.pravatar.cc/150?u=ahmad",
       status: "Online",
+      role: "Plumbing Expert",
       messages: [
         { id: 101, sender: 'tasker', text: "I can be there by 4:00 PM.", time: "10:00 AM" },
-        { id: 102, sender: 'user', text: "That works for me, Ahmad!", time: "10:05 AM" },
+        { id: 102, sender: 'user', text: "That works for me, Ahmad! Please bring the pipe connectors.", time: "10:05 AM" },
       ]
     },
     {
@@ -29,16 +30,15 @@ const ChatPage = () => {
       fullName: "Kamran Siddiqui",
       image: "https://i.pravatar.cc/150?u=kamran",
       status: "Online",
+      role: "Electrician",
       messages: [
         { id: 401, sender: 'tasker', text: "I've reviewed your request for the kitchen fitting.", time: "09:30 AM" }
       ]
     }
   ]);
 
-  // 2. DYNAMIC SELECTION LOGIC
   const [activeChatId, setActiveChatId] = useState(state?.tasker?.id || 1);
 
-  // Handle incoming Tasker from Modal
   useEffect(() => {
     if (state?.tasker) {
       const exists = conversations.find(c => c.id === state.tasker.id);
@@ -48,10 +48,11 @@ const ChatPage = () => {
           fullName: state.tasker.fullName,
           image: state.tasker.image,
           status: "Online",
+          role: "Service Provider",
           messages: [{ 
             id: Date.now(), 
             sender: 'tasker', 
-            text: `Hi! I'm ${state.tasker.fullName}. I noticed you were looking at my profile. How can I assist you?`, 
+            text: `Hi! I'm ${state.tasker.fullName}. How can I help you today?`, 
             time: "Just now" 
           }]
         };
@@ -89,131 +90,139 @@ const ChatPage = () => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeChatId, conversations]);
 
-  // Filter conversations based on search
   const filteredChats = conversations.filter(c => 
     c.fullName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="h-screen w-full bg-[#050505] text-white font-['Inter'] flex overflow-hidden fixed inset-0">
+    <div className="h-screen w-full bg-slate-50 text-slate-900 flex overflow-hidden fixed inset-0">
       
       {/* SIDEBAR */}
-      <div className="hidden lg:flex w-[380px] border-r border-white/5 flex-col bg-[#0A0A0A]">
-        <div className="p-8 space-y-6">
-            <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-500 hover:text-[#00D1D1] text-[10px] font-black uppercase tracking-widest transition-all">
-                <ArrowLeft size={14}/> Back to Hub
+      <div className="hidden lg:flex w-[380px] border-r border-gray-200 flex-col bg-white">
+        <div className="p-6 space-y-6">
+            <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-400 hover:text-teal-600 text-xs font-bold transition-all">
+                <ArrowLeft size={16}/> Back to Dashboard
             </button>
-            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Messages</h2>
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight">Messages</h2>
             <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16}/>
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16}/>
                 <input 
                   type="text" 
-                  placeholder="Find contact..." 
+                  placeholder="Search chats..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-black border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-xs font-bold outline-none focus:border-[#00D1D1] transition-all" 
+                  className="w-full bg-slate-50 border border-gray-100 rounded-xl py-2.5 pl-11 pr-4 text-sm focus:border-teal-500 outline-none transition-all" 
                 />
             </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto px-3 custom-scrollbar">
             {filteredChats.map((chat) => (
                 <div 
                     key={chat.id}
                     onClick={() => setActiveChatId(chat.id)}
-                    className={`p-5 rounded-[2rem] flex items-center gap-4 cursor-pointer transition-all mb-2 border
-                        ${activeChatId === chat.id ? 'bg-[#00D1D1]/10 border-[#00D1D1]/30' : 'bg-transparent border-transparent hover:bg-white/5'}`}
+                    className={`p-4 rounded-2xl flex items-center gap-4 cursor-pointer transition-all mb-1
+                        ${activeChatId === chat.id ? 'bg-teal-50' : 'bg-transparent hover:bg-slate-50'}`}
                 >
-                    <img src={chat.image} className="w-12 h-12 rounded-2xl object-cover ring-2 ring-white/5" alt="pro" />
+                    <div className="relative">
+                      <img src={chat.image} className="w-12 h-12 rounded-xl object-cover" alt="avatar" />
+                      {chat.status === "Online" && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"></div>}
+                    </div>
                     <div className="flex-1 overflow-hidden">
-                        <h5 className={`text-[11px] font-black uppercase tracking-tight ${activeChatId === chat.id ? 'text-[#00D1D1]' : 'text-gray-400'}`}>{chat.fullName}</h5>
-                        <p className="text-[9px] text-gray-600 font-bold truncate uppercase">
+                        <div className="flex justify-between items-center mb-0.5">
+                          <h5 className={`text-sm font-bold truncate ${activeChatId === chat.id ? 'text-teal-700' : 'text-slate-900'}`}>{chat.fullName}</h5>
+                          <span className="text-[10px] text-gray-400 font-medium">10:05 AM</span>
+                        </div>
+                        <p className="text-xs text-gray-500 truncate font-medium">
                           {chat.messages[chat.messages.length - 1]?.text}
                         </p>
                     </div>
-                    {chat.status === "Online" && <div className="w-1.5 h-1.5 bg-[#00D1D1] rounded-full shadow-[0_0_8px_#00D1D1]"></div>}
                 </div>
             ))}
         </div>
       </div>
 
       {/* CHAT WINDOW */}
-      <div className="flex-1 flex flex-col h-full bg-[#050505]">
+      <div className="flex-1 flex flex-col h-full bg-white lg:bg-slate-50">
         
         {/* Header */}
-        <div className="h-24 shrink-0 border-b border-white/5 bg-[#0A0A0A]/90 backdrop-blur-md flex items-center justify-between px-10 z-10">
+        <div className="h-20 shrink-0 border-b border-gray-200 lg:border-none bg-white lg:bg-transparent flex items-center justify-between px-8 z-10">
             <div className="flex items-center gap-4">
-                <div className="relative">
-                  <img src={activeChat.image} className="w-12 h-12 rounded-2xl object-cover ring-2 ring-[#00D1D1]/20" />
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#00D1D1] rounded-full border-2 border-[#0A0A0A]"></div>
-                </div>
+                <img src={activeChat.image} className="w-11 h-11 rounded-xl object-cover shadow-sm" />
                 <div>
-                    <h4 className="font-black uppercase italic tracking-tight text-xl">{activeChat.fullName}</h4>
-                    <p className="text-[9px] font-black text-[#00D1D1] uppercase tracking-[0.2em]">Verified Expert</p>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-slate-900">{activeChat.fullName}</h4>
+                      <ShieldCheck size={16} className="text-teal-500" />
+                    </div>
+                    <p className="text-[11px] font-bold text-teal-600 uppercase tracking-wider">{activeChat.role}</p>
                 </div>
             </div>
-            <div className="flex items-center gap-6 text-gray-500">
-                <Phone size={20} className="hover:text-[#00D1D1] cursor-pointer transition-all"/>
-                <Video size={20} className="hover:text-[#00D1D1] cursor-pointer transition-all"/>
-                <MoreVertical size={20} className="hover:text-white cursor-pointer"/>
+            <div className="flex items-center gap-4 text-slate-400">
+                <button className="p-2.5 hover:bg-teal-50 hover:text-teal-600 rounded-xl transition-all border border-transparent hover:border-teal-100">
+                  <Phone size={20} />
+                </button>
+                <button className="p-2.5 hover:bg-teal-50 hover:text-teal-600 rounded-xl transition-all border border-transparent hover:border-teal-100">
+                  <Video size={20} />
+                </button>
+                <button className="p-2.5 hover:bg-slate-100 hover:text-slate-900 rounded-xl transition-all">
+                  <MoreVertical size={20} />
+                </button>
             </div>
         </div>
 
         {/* Message Thread */}
-        <div className="flex-1 overflow-y-auto p-10 space-y-8 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 lg:p-10 space-y-6 custom-scrollbar bg-white lg:m-4 lg:rounded-[2.5rem] lg:shadow-inner border border-gray-100">
             {activeChat.messages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className="max-w-[65%] space-y-2">
-                        <div className={`p-5 rounded-[2rem] text-sm font-medium leading-relaxed whitespace-pre-wrap shadow-2xl
+                    <div className={`max-w-[75%] lg:max-w-[60%] space-y-1`}>
+                        <div className={`p-4 rounded-2xl text-sm font-medium leading-relaxed shadow-sm
                             ${msg.sender === 'user' 
-                                ? 'bg-[#00D1D1] text-black rounded-tr-none shadow-[0_10px_30px_rgba(0,209,209,0.2)]' 
-                                : 'bg-white/5 border border-white/10 text-gray-200 rounded-tl-none'}`}>
+                                ? 'bg-teal-600 text-white rounded-tr-none' 
+                                : 'bg-slate-100 text-slate-700 rounded-tl-none'}`}>
                             {msg.text}
                         </div>
-                        <p className={`text-[8px] font-black text-gray-700 uppercase px-4 flex items-center gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            {msg.time} {msg.sender === 'user' && <CheckCheck size={12} className="text-[#00D1D1]"/>}
-                        </p>
+                        <div className={`flex items-center gap-1.5 px-1 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <span className="text-[10px] font-bold text-slate-300 uppercase">{msg.time}</span>
+                            {msg.sender === 'user' && <CheckCheck size={14} className="text-teal-500"/>}
+                        </div>
                     </div>
                 </div>
             ))}
             <div ref={scrollRef} />
         </div>
 
-        {/* Multi-line Input Bar */}
-        <div className="p-8 bg-[#0A0A0A] border-t border-white/5 shrink-0">
-            <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto flex items-end gap-4 bg-black border border-white/10 p-3 rounded-[2.5rem] focus-within:border-[#00D1D1] transition-all">
-                <div className="flex items-center gap-1 pb-1">
-                  <button type="button" className="p-3 text-gray-500 hover:text-[#00D1D1] transition-colors"><Paperclip size={22}/></button>
-                  <button type="button" className="p-3 text-gray-500 hover:text-[#00D1D1] transition-colors"><Smile size={22}/></button>
-                </div>
+        {/* Input Bar */}
+        <div className="p-6 shrink-0 bg-white lg:bg-transparent">
+            <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto flex items-end gap-3 bg-white border border-gray-200 p-2 rounded-2xl shadow-sm focus-within:border-teal-400 focus-within:ring-4 focus-within:ring-teal-50 transition-all">
+                <button type="button" className="p-3 text-slate-400 hover:text-teal-600 transition-colors"><Paperclip size={20}/></button>
                 
                 <textarea 
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }}}
-                    placeholder={`Message ${activeChat.fullName.split(' ')[0]}...`} 
+                    placeholder={`Write your message...`} 
                     rows={1}
-                    className="flex-1 bg-transparent border-none py-3 px-2 text-sm font-medium outline-none placeholder:text-gray-800 resize-none max-h-32 custom-scrollbar overflow-y-auto"
+                    className="flex-1 bg-transparent border-none py-3 px-1 text-sm font-medium outline-none placeholder:text-slate-300 resize-none max-h-32 custom-scrollbar overflow-y-auto"
                 />
 
                 <button 
                   type="submit" 
                   disabled={!message.trim()} 
-                  className={`p-4 rounded-2xl transition-all shrink-0 
-                    ${message.trim() ? 'bg-[#00D1D1] text-black shadow-[0_0_25px_rgba(0,209,209,0.4)] hover:scale-105' : 'bg-white/5 text-gray-800'}`}
+                  className={`p-3.5 rounded-xl transition-all shrink-0 
+                    ${message.trim() ? 'bg-teal-600 text-white shadow-lg shadow-teal-100 hover:bg-teal-700' : 'bg-slate-100 text-slate-300'}`}
                 >
-                    <Send size={20} />
+                    <Send size={18} />
                 </button>
             </form>
+            <p className="text-center text-[10px] text-slate-400 mt-4 font-medium">Messages are end-to-end encrypted with SmartRozgar Security</p>
         </div>
       </div>
 
-      {/* Global CSS for thin scrollbars */}
       <style dangerouslySetInnerHTML={{ __html: `
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 209, 209, 0.2); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #00D1D1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
       `}} />
     </div>
   );

@@ -29,81 +29,84 @@ const Working = () => {
   ];
 
   return (
-    <section id="how-it-works" className="w-full py-24 px-6 bg-[#050505] font-['Inter'] relative overflow-hidden">
+    <section id="how-it-works" className="w-full py-24 px-6 bg-white font-['Inter'] relative overflow-hidden">
       
-      {/* Background Tech-Grid or Subtle Light */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-1 h-full bg-gradient-to-b from-transparent via-[#00D1D1]/5 to-transparent"></div>
-        <div className="absolute top-0 right-1/4 w-1 h-full bg-gradient-to-b from-transparent via-[#00D1D1]/5 to-transparent"></div>
+      {/* Background Subtle Elements */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-40">
+        <div className="absolute top-0 left-1/4 w-[1px] h-full bg-gradient-to-b from-transparent via-gray-200 to-transparent"></div>
+        <div className="absolute top-0 right-1/4 w-[1px] h-full bg-gradient-to-b from-transparent via-gray-200 to-transparent"></div>
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         
         {/* Header */}
         <div className="text-center mb-24" data-aos="fade-up">
-          <h2 className="text-4xl sm:text-6xl font-black text-white mb-6">
-            Simple <span className="text-[#00D1D1]">Process</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#008080]/5 border border-[#008080]/10 rounded-full text-[#008080] text-xs font-black uppercase tracking-widest mb-6">
+             Step-by-Step Guide
+          </div>
+          <h2 className="text-4xl sm:text-6xl font-[1000] text-gray-900 mb-6 tracking-tight">
+            Simple <span className="text-[#008080]">Process</span>
           </h2>
-          <p className="max-w-xl text-lg text-gray-400 mx-auto leading-relaxed">
+          <p className="max-w-xl text-lg text-gray-500 mx-auto leading-relaxed">
             Getting your home serviced has never been this seamless. Follow our 
-            <span className="text-white"> 3-step guide</span> to excellence.
+            <span className="text-[#008080] font-bold"> 3-step guide</span> to excellence.
           </p>
         </div>
 
         <div className="relative">
-          {/* Central Line - Glowing Neon Gradient */}
-          <div className="hidden lg:block absolute left-1/2 transform -translate-x-1/2 h-full w-[2px] bg-gradient-to-b from-[#00D1D1]/0 via-[#00D1D1]/40 to-[#00D1D1]/0 z-0"></div>
+          {/* Central Line - Professional Subtle Teal Line */}
+          <div className="hidden lg:block absolute left-1/2 transform -translate-x-1/2 h-full w-[2px] bg-gradient-to-b from-gray-100 via-[#008080]/20 to-gray-100 z-0"></div>
 
           {steps.map((step, index) => (
-            <div key={step.id} className="relative z-10 mb-24 last:mb-0" data-aos={step.direction === 'reverse' ? 'fade-left' : 'fade-right'}>
+            <div key={step.id} className="relative z-10 mb-32 last:mb-0" data-aos={step.direction === 'reverse' ? 'fade-left' : 'fade-right'}>
               
               {/* Desktop Layout */}
               <div className="hidden lg:flex items-center justify-between w-full group">
                 
-                {/* Left Side Content */}
+                {/* Side Content Box */}
                 <div className={`w-[42%] ${step.direction === 'reverse' ? 'order-3 text-left' : 'order-1 text-right'}`}>
-                   <div className="p-8 rounded-[2.5rem] bg-[#0A0A0A] border border-white/5 group-hover:border-[#00D1D1]/20 transition-all duration-500 shadow-2xl">
-                     <span className="inline-block text-[#00D1D1] font-black text-5xl opacity-20 mb-4 group-hover:opacity-100 transition-opacity">{step.id}</span>
-                     <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-[#00D1D1] transition-colors">{step.title}</h3>
-                     <p className="text-gray-400 text-base leading-relaxed group-hover:text-gray-200">{step.description}</p>
+                   <div className="p-10 rounded-[3rem] bg-white border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)] group-hover:shadow-[0_30px_60px_rgba(0,128,128,0.1)] group-hover:border-[#008080]/20 transition-all duration-500">
+                     <span className="inline-block text-[#008080] font-black text-6xl opacity-10 mb-4 group-hover:opacity-100 group-hover:-translate-y-2 transition-all duration-500">{step.id}</span>
+                     <h3 className="text-3xl font-black text-gray-900 mb-4 group-hover:text-[#008080] transition-colors">{step.title}</h3>
+                     <p className="text-gray-500 text-lg leading-relaxed group-hover:text-gray-700">{step.description}</p>
                    </div>
                 </div>
 
-                {/* Center Number Hub */}
+                {/* Center Number Hub (Teal Circle) */}
                 <div className="w-[16%] order-2 flex justify-center relative">
-                  <div className="bg-[#00D1D1] w-14 h-14 rounded-2xl flex items-center justify-center shadow-[0_0_25px_rgba(0,209,209,0.4)] group-hover:rotate-[360deg] transition-all duration-700 z-10 border-4 border-black"> 
-                    <span className="text-xl font-black text-black">{step.id}</span>
+                  <div className="bg-[#008080] w-16 h-16 rounded-3xl flex items-center justify-center shadow-lg shadow-[#008080]/30 group-hover:rotate-[360deg] transition-all duration-1000 z-10 border-4 border-white"> 
+                    <span className="text-xl font-black text-white">{step.id}</span>
                   </div>
-                  {/* Subtle pulsing ring */}
-                  <div className="absolute w-14 h-14 bg-[#00D1D1]/20 rounded-2xl animate-ping"></div>
+                  {/* Pulse Effect */}
+                  <div className="absolute w-16 h-16 bg-[#008080]/20 rounded-3xl animate-ping"></div>
                 </div>
 
-                {/* Right Side Image */}
+                {/* Image Box */}
                 <div className={`w-[42%] ${step.direction === 'reverse' ? 'order-1' : 'order-3'}`}>
-                    <div className="relative group overflow-hidden rounded-[2.5rem] h-64 border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-[#00D1D1]/30">
+                    <div className="relative group overflow-hidden rounded-[3rem] h-80 border-8 border-gray-50 shadow-xl transition-all duration-500 group-hover:border-white">
                       <img 
                         src={step.image} 
                         alt={step.alt} 
-                        className="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
+                        className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#008080]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     </div>
                 </div>
               </div>
 
               {/* Mobile Layout */}
-              <div className="lg:hidden flex flex-col items-center text-center space-y-6">
-                 <div className="bg-[#00D1D1] w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg">
-                   <span className="text-xl font-black text-black">{step.id}</span>
+              <div className="lg:hidden flex flex-col items-center text-center space-y-8 px-4">
+                 <div className="bg-[#008080] w-16 h-16 rounded-3xl flex items-center justify-center shadow-xl shadow-[#008080]/20">
+                   <span className="text-xl font-black text-white">{step.id}</span>
                  </div>
                  
-                 <div className="w-full h-56 rounded-[2rem] overflow-hidden border border-white/10 shadow-xl">
+                 <div className="w-full h-64 rounded-[2.5rem] overflow-hidden border-4 border-white shadow-2xl">
                    <img src={step.image} alt={step.alt} className="w-full h-full object-cover" />
                  </div>
 
-                 <div className="px-4">
-                   <h3 className="text-2xl font-bold text-white mb-3">{step.title}</h3>
-                   <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
+                 <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-lg">
+                   <h3 className="text-2xl font-black text-gray-900 mb-3">{step.title}</h3>
+                   <p className="text-gray-500 text-base leading-relaxed">{step.description}</p>
                  </div>
               </div>
 
@@ -111,10 +114,10 @@ const Working = () => {
           ))}
         </div>
 
-        {/* Bottom CTA for Working Section */}
-        <div className="mt-20 text-center" data-aos="zoom-in">
-           <p className="text-gray-500 font-medium mb-6 italic">Ready to experience the future of home maintenance?</p>
-           <button className="px-10 py-4 bg-[#00D1D1] text-black font-black rounded-full hover:shadow-[0_0_30px_rgba(0,209,209,0.5)] transition-all transform hover:scale-105 active:scale-95 uppercase tracking-widest text-sm">
+        {/* Bottom CTA */}
+        <div className="mt-24 text-center" data-aos="zoom-in">
+           <p className="text-gray-400 font-bold uppercase tracking-widest text-xs mb-8">Ready to start?</p>
+           <button className="px-12 py-5 bg-[#008080] text-white font-[1000] rounded-2xl shadow-xl shadow-[#008080]/30 hover:bg-[#006666] transition-all transform hover:scale-105 active:scale-95 uppercase tracking-tighter text-lg">
              Book Your First Service
            </button>
         </div>

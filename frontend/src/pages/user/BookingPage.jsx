@@ -3,16 +3,29 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, ShieldCheck, MapPin, CheckCircle2, 
   Upload, Info, AlertCircle, Clock, Zap, Shield, 
-  Copy, Check, Landmark, Wallet, Smartphone 
+  Copy, Check, Landmark, Wallet, Smartphone, ChevronRight
 } from 'lucide-react';
 
 const BookingPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   
-  const tasker = state?.tasker;
+  const tasker = state?.tasker || {
+    id: 1,
+    fullName: "Ahmad Hassan",
+    image: "https://i.pravatar.cc/150?u=ahmad",
+    pricing: {
+      basic: { price: "800" },
+      standard: { price: "1500" },
+      premium: { price: "3000" }
+    }
+  };
+
   const selectedPlanKey = state?.plan || 'standard';
-  const planInfo = tasker?.pricing[selectedPlanKey];
+  const planInfo = tasker.pricing[selectedPlanKey];
+
+  // --- STEPPER STATE ---
+  const [currentStep, setCurrentStep] = useState(1);
 
   // --- FORM STATES ---
   const [requirements, setRequirements] = useState("");
@@ -20,17 +33,13 @@ const BookingPage = () => {
   const [date, setDate] = useState("");
   const [receipt, setReceipt] = useState(null);
   const [copied, setCopied] = useState(false);
-  
-  // --- PAYMENT METHOD STATE ---
-  const [activeMethod, setActiveMethod] = useState('bank'); // 'bank', 'easypaisa', 'jazzcash'
-  
-  // --- ADD-ONS & PRICING ---
+  const [activeMethod, setActiveMethod] = useState('bank'); 
   const [addons, setAddons] = useState({ material: false, express: false });
   const [totalPrice, setTotalPrice] = useState(0);
   const serviceFee = 250;
 
   const paymentDetails = {
-    bank: { name: "Meezan Bank", title: "FixIt Escrow", account: "PK70 MEZN 1234 5678 9012", icon: <Landmark size={18}/> },
+    bank: { name: "Meezan Bank", title: "SmartRozgar Escrow", account: "PK70 MEZN 1234 5678 9012", icon: <Landmark size={18}/> },
     easypaisa: { name: "EasyPaisa", title: "M. Ahmad (Admin)", account: "0300 1234567", icon: <Wallet size={18}/> },
     jazzcash: { name: "JazzCash", title: "M. Ahmad (Admin)", account: "0321 7654321", icon: <Smartphone size={18}/> }
   };
@@ -50,182 +59,162 @@ const BookingPage = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (!tasker) return <div className="h-screen bg-black flex items-center justify-center text-white italic font-black">Redirecting...</div>;
+  const nextStep = () => setCurrentStep(prev => prev + 1);
+  const prevStep = () => setCurrentStep(prev => prev - 1);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-['Inter'] pb-20">
+    <div className="min-h-screen bg-[#FDFDFD] text-slate-900 pb-20 font-['Inter']">
       
-      {/* HEADER SECTION */}
-      <div className="pt-24 pb-8 px-6 bg-[#0A0A0A] border-b border-white/5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-500 hover:text-[#00D1D1] text-[10px] font-black uppercase tracking-widest transition-all">
-                <ArrowLeft size={14}/> Back to Selection
-            </button>
-            <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.3em] hidden md:flex">
-                <span className="text-gray-600">01 Selection</span>
-                <div className="h-[1px] w-6 bg-white/10"></div>
-                <span className="text-[#00D1D1]">02 Checkout</span>
-                <div className="h-[1px] w-6 bg-white/10"></div>
-                <span className="text-gray-800">03 Confirm</span>
+      {/* PROFESSIONAL STEPPER HEADER */}
+      <div className="pt-20 pb-8 px-6 bg-white border-b border-slate-100 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto flex flex-col items-center">
+            
+            <div className="flex items-center justify-center w-full max-w-xl">
+              {[1, 2, 3].map((step) => (
+                <React.Fragment key={step}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-black border-2 transition-all duration-300 
+                      ${currentStep >= step ? 'bg-teal-600 border-teal-600 text-white shadow-md' : 'bg-white border-slate-200 text-slate-400'}`}>
+                      {currentStep > step ? <CheckCircle2 size={18}/> : step}
+                    </div>
+                    <span className={`text-[11px] font-bold uppercase tracking-wider hidden md:block
+                      ${currentStep >= step ? 'text-teal-600' : 'text-slate-400'}`}>
+                      {step === 1 ? "Requirements" : step === 2 ? "Add-ons" : "Payment"}
+                    </span>
+                  </div>
+                  {step < 3 && <div className={`h-[2px] w-12 mx-4 rounded-full transition-colors duration-500 ${currentStep > step ? 'bg-teal-600' : 'bg-slate-100'}`}></div>}
+                </React.Fragment>
+              ))}
             </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-12 gap-10">
         
-        {/* LEFT COLUMN: THE FORMS */}
-        <div className="lg:col-span-8 space-y-12">
+        {/* LEFT COLUMN: STEP CONTENT */}
+        <div className="lg:col-span-8">
             
-            {/* SECTION 1: REQUIREMENTS */}
-            <section className="space-y-6">
-                <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-tight">Job <span className="text-[#00D1D1]">Scope</span></h2>
-                <div className="space-y-4">
-                    <textarea 
-                        rows={4}
-                        placeholder="Explain the problem in detail. (e.g., 'The kitchen sink pipe is cracked, I need a replacement...')"
-                        className="w-full bg-white/5 border border-white/10 rounded-[2rem] p-6 text-sm focus:border-[#00D1D1] outline-none transition-all resize-none shadow-inner"
-                        onChange={(e) => setRequirements(e.target.value)}
-                    />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="relative">
-                            <MapPin className="absolute left-5 top-5 text-gray-500" size={16}/>
-                            <input type="text" placeholder="House #, Street, Block..." className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 text-sm outline-none focus:border-[#00D1D1]" onChange={(e)=>setAddress(e.target.value)} />
-                        </div>
-                        <div className="relative">
-                            <Clock className="absolute left-5 top-5 text-gray-500" size={16}/>
-                            <input type="date" className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-14 pr-6 text-sm outline-none focus:border-[#00D1D1]" onChange={(e)=>setDate(e.target.value)} />
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {/* STEP 1: JOB SCOPE */}
+            {currentStep === 1 && (
+              <section className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold tracking-tight">Project <span className="text-teal-600">Details</span></h2>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase bg-slate-50 px-3 py-1 rounded-full">Step 1 of 3</span>
+                  </div>
+                  <div className="space-y-6">
+                      <div className="flex flex-col gap-2">
+                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Tell the professional what happened</label>
+                        <textarea rows={5} placeholder="e.g. The water heater is making a loud noise and not heating properly..." className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-6 text-sm font-medium focus:bg-white focus:border-teal-600 outline-none transition-all resize-none shadow-inner" onChange={(e) => setRequirements(e.target.value)} value={requirements}/>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="relative group">
+                              <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-teal-600 transition-colors" size={18}/>
+                              <input type="text" placeholder="Full Address" className="w-full bg-slate-50 border border-slate-100 rounded-xl py-4 pl-14 pr-6 text-sm font-semibold outline-none focus:bg-white focus:border-teal-600" onChange={(e)=>setAddress(e.target.value)} value={address}/>
+                          </div>
+                          <div className="relative group">
+                              <Clock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-teal-600 transition-colors" size={18}/>
+                              <input type="date" className="w-full bg-slate-50 border border-slate-100 rounded-xl py-4 pl-14 pr-6 text-sm font-semibold outline-none focus:bg-white focus:border-teal-600" onChange={(e)=>setDate(e.target.value)} value={date}/>
+                          </div>
+                      </div>
+                  </div>
+                  <button onClick={nextStep} disabled={!requirements || !address || !date} className="w-full py-5 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 disabled:opacity-30 flex items-center justify-center gap-2 transition-all">
+                    Next Step <ChevronRight size={18}/>
+                  </button>
+              </section>
+            )}
 
-            {/* SECTION 2: ADD-ONS */}
-            <section className="pt-10 border-t border-white/5 space-y-6">
-                <h3 className="text-2xl font-black uppercase italic tracking-tight flex items-center gap-3">
-                    <Zap size={20} className="text-[#00D1D1] fill-[#00D1D1]/20"/> Recommended Extras
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button onClick={() => setAddons(p => ({...p, material: !p.material}))} className={`p-6 rounded-[2rem] border transition-all flex justify-between items-center group ${addons.material ? 'bg-[#00D1D1] border-[#00D1D1] text-black' : 'bg-white/5 border-white/10'}`}>
-                        <div className="text-left"><p className="text-xs font-black uppercase">Source Materials</p><p className={`text-[8px] font-bold uppercase ${addons.material ? 'text-black/60' : 'text-gray-500'}`}>Tasker buys parts for you</p></div>
-                        <span className="font-black">+Rs.500</span>
-                    </button>
-                    <button onClick={() => setAddons(p => ({...p, express: !p.express}))} className={`p-6 rounded-[2rem] border transition-all flex justify-between items-center group ${addons.express ? 'bg-[#00D1D1] border-[#00D1D1] text-black' : 'bg-white/5 border-white/10'}`}>
-                        <div className="text-left"><p className="text-xs font-black uppercase">Express Service</p><p className={`text-[8px] font-bold uppercase ${addons.express ? 'text-black/60' : 'text-gray-500'}`}>Arrival in 60 minutes</p></div>
-                        <span className="font-black">+Rs.300</span>
-                    </button>
-                </div>
-            </section>
+            {/* STEP 2: ADD-ONS */}
+            {currentStep === 2 && (
+              <section className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <h3 className="text-xl font-bold flex items-center gap-3">Recommended <span className="text-teal-600">Extras</span></h3>
+                  <div className="grid grid-cols-1 gap-4">
+                      <button onClick={() => setAddons(p => ({...p, material: !p.material}))} className={`p-6 rounded-2xl border-2 transition-all flex justify-between items-center ${addons.material ? 'bg-teal-50 border-teal-600' : 'bg-slate-50 border-slate-100'}`}>
+                          <div className="text-left"><p className="text-sm font-bold">Source Materials</p><p className="text-[11px] text-slate-400">Professional will purchase parts for you</p></div>
+                          <span className="font-bold text-teal-600">+Rs.500</span>
+                      </button>
+                      <button onClick={() => setAddons(p => ({...p, express: !p.express}))} className={`p-6 rounded-2xl border-2 transition-all flex justify-between items-center ${addons.express ? 'bg-teal-50 border-teal-600' : 'bg-slate-50 border-slate-100'}`}>
+                          <div className="text-left"><p className="text-sm font-bold">Priority Arrival</p><p className="text-[11px] text-slate-400">Response within 60 minutes</p></div>
+                          <span className="font-bold text-teal-600">+Rs.300</span>
+                      </button>
+                  </div>
+                  <div className="flex gap-4">
+                    <button onClick={prevStep} className="flex-1 py-5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200">Previous</button>
+                    <button onClick={nextStep} className="flex-[2] py-5 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700">Continue to Payment</button>
+                  </div>
+              </section>
+            )}
 
-            {/* SECTION 3: MULTI-METHOD ESCROW PAYMENT */}
-            <section className="pt-10 border-t border-white/5 space-y-8">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#00D1D1]/10 flex items-center justify-center text-[#00D1D1] shadow-[0_0_20px_rgba(0,209,209,0.1)]"><ShieldCheck size={24}/></div>
-                    <div>
-                        <h3 className="text-2xl font-black uppercase italic leading-none text-white">Secure Escrow</h3>
-                        <p className="text-[9px] text-gray-500 uppercase font-black tracking-widest mt-1">Manual Verification Required</p>
-                    </div>
-                </div>
+            {/* STEP 3: PAYMENT */}
+            {currentStep === 3 && (
+              <section className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white"><ShieldCheck size={24}/></div>
+                      <div><h3 className="text-lg font-bold text-slate-900 leading-none">Secure Escrow Payment</h3><p className="text-xs text-slate-400 font-medium mt-1">Manual Verification Required</p></div>
+                  </div>
 
-                {/* METHOD TABS */}
-                <div className="flex gap-2 p-1 bg-white/5 rounded-2xl border border-white/10">
-                  {['bank', 'easypaisa', 'jazzcash'].map((method) => (
-                    <button 
-                      key={method}
-                      onClick={() => setActiveMethod(method)}
-                      className={`flex-1 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${activeMethod === method ? 'bg-[#00D1D1] text-black shadow-lg' : 'text-gray-500 hover:text-white'}`}
-                    >
-                      {paymentDetails[method].icon} {method}
-                    </button>
-                  ))}
-                </div>
+                  <div className="flex gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
+                    {['bank', 'easypaisa', 'jazzcash'].map((method) => (
+                      <button key={method} onClick={() => setActiveMethod(method)} className={`flex-1 py-3 rounded-lg text-[11px] font-bold uppercase transition-all flex items-center justify-center gap-2 ${activeMethod === method ? 'bg-white text-teal-600 shadow-sm' : 'text-slate-400'}`}>
+                        {paymentDetails[method].icon} {method}
+                      </button>
+                    ))}
+                  </div>
 
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-[3rem] p-8 space-y-8 relative overflow-hidden">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-                        <div className="p-6 bg-black/40 rounded-3xl border border-white/5 relative group">
-                            <p className="text-[9px] text-gray-600 font-black uppercase mb-2">{paymentDetails[activeMethod].name} Number / IBAN</p>
-                            <p className="text-sm font-mono font-bold text-[#00D1D1] break-all">{paymentDetails[activeMethod].account}</p>
-                            <button onClick={()=>copyToClipboard(paymentDetails[activeMethod].account)} className="absolute top-6 right-6 text-gray-600 hover:text-white transition-colors">
-                                {copied ? <Check size={14} className="text-[#00D1D1]"/> : <Copy size={14}/>}
-                            </button>
-                        </div>
-                        <div className="p-6 bg-black/40 rounded-3xl border border-white/5">
-                            <p className="text-[9px] text-gray-600 font-black uppercase mb-2">Account Title</p>
-                            <p className="text-sm font-bold uppercase text-white tracking-tight">{paymentDetails[activeMethod].title}</p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="relative group border-2 border-dashed border-white/10 rounded-[2.5rem] p-12 hover:border-[#00D1D1]/40 transition-all text-center bg-white/[0.01]">
-                            <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e)=>setReceipt(e.target.files[0])}/>
-                            <div className="p-4 bg-black w-fit mx-auto rounded-2xl mb-4 text-gray-600 group-hover:text-[#00D1D1] transition-colors">
-                                <Upload size={24} />
-                            </div>
-                            <p className="text-[10px] font-black uppercase text-gray-500 tracking-widest">
-                                {receipt ? <span className="text-[#00D1D1]">{receipt.name}</span> : `Upload ${activeMethod} Receipt`}
-                            </p>
-                        </div>
-                        <div className="p-5 bg-amber-500/5 rounded-[1.5rem] border border-amber-500/10 flex items-start gap-4">
-                            <AlertCircle size={18} className="text-amber-500 shrink-0" />
-                            <p className="text-[9px] text-gray-500 uppercase font-black leading-relaxed">
-                                Our admin team will verify this screenshot. Money is held in Escrow and only released to the professional after you approve the completed work.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                  <div className="bg-slate-50 rounded-2xl p-6 space-y-6">
+                      <div className="p-5 bg-white rounded-xl border border-slate-100 relative">
+                          <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">Account Number</p>
+                          <p className="text-sm font-mono font-bold text-slate-800">{paymentDetails[activeMethod].account}</p>
+                          <button onClick={()=>copyToClipboard(paymentDetails[activeMethod].account)} className="absolute top-5 right-5 text-slate-300 hover:text-teal-600">
+                              {copied ? <Check size={16}/> : <Copy size={16}/>}
+                          </button>
+                      </div>
+                      <div className="relative border-2 border-dashed border-slate-200 rounded-2xl p-8 hover:border-teal-600 hover:bg-white transition-all text-center">
+                          <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e)=>setReceipt(e.target.files[0])}/>
+                          <div className="p-3 bg-teal-50 w-fit mx-auto rounded-xl mb-2 text-teal-600"><Upload size={24}/></div>
+                          <p className="text-xs font-bold text-slate-500">{receipt ? receipt.name : `Upload Payment Receipt`}</p>
+                      </div>
+                  </div>
+                  
+                  <div className="flex gap-4">
+                    <button onClick={prevStep} className="flex-1 py-5 bg-slate-100 text-slate-600 font-bold rounded-xl">Back</button>
+                    <button onClick={() => navigate('/success')} disabled={!receipt} className="flex-[2] py-5 bg-teal-600 text-white font-bold rounded-xl shadow-lg shadow-teal-100 disabled:opacity-30">Confirm & Book</button>
+                  </div>
+              </section>
+            )}
         </div>
 
-        {/* RIGHT COLUMN: DYNAMIC INVOICE */}
+        {/* RIGHT COLUMN: INVOICE */}
         <div className="lg:col-span-4">
-            <div className="sticky top-32 space-y-6">
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-[3.5rem] p-10 space-y-8 relative overflow-hidden shadow-2xl">
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-[#00D1D1]/5 blur-[100px] rounded-full"></div>
-                    
-                    <div className="flex items-center gap-4 pb-8 border-b border-white/5 relative z-10">
-                        <img src={tasker.image} className="w-16 h-16 rounded-2xl object-cover ring-2 ring-white/5" />
-                        <div>
-                            <h4 className="font-black uppercase italic text-lg leading-none">{tasker.fullName}</h4>
-                            <div className="flex items-center gap-1 mt-2">
-                                <ShieldCheck size={12} className="text-[#00D1D1]"/>
-                                <span className="text-[8px] text-gray-500 font-black uppercase tracking-widest">Verified Expert</span>
-                            </div>
-                        </div>
+            <div className="sticky top-32 bg-white border border-slate-100 rounded-[2rem] p-8 space-y-6 shadow-sm">
+                <div className="flex items-center gap-4 pb-6 border-b border-slate-50">
+                    <img src={tasker.image} className="w-12 h-12 rounded-lg object-cover" />
+                    <div>
+                        <h4 className="font-bold text-slate-900 leading-none">{tasker.fullName}</h4>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase mt-1 block tracking-wider">Verified Professional</span>
                     </div>
+                </div>
 
-                    <div className="space-y-4 text-[11px] font-black uppercase tracking-widest text-gray-500 relative z-10">
-                        <div className="flex justify-between items-center">
-                            <span>{selectedPlanKey} Package</span>
-                            <span className="text-white font-black italic text-sm">Rs. {planInfo.price}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <span>Service Fee (Escrow)</span>
-                            <span className="text-white font-black italic text-sm">+Rs. {serviceFee}</span>
-                        </div>
-                        {addons.material && <div className="flex justify-between items-center text-[#00D1D1]"><span>Material Sourcing</span><span>+Rs. 500</span></div>}
-                        {addons.express && <div className="flex justify-between items-center text-[#00D1D1]"><span>Express Arrival</span><span>+Rs. 300</span></div>}
-                        
-                        <div className="h-[1px] bg-white/5 my-6"></div>
-                        
-                        <div className="flex justify-between items-center">
-                            <span className="text-xs italic">Total Payable</span>
-                            <span className="text-5xl font-black italic tracking-tighter text-white leading-none">Rs.{totalPrice}</span>
-                        </div>
+                <div className="space-y-3">
+                    <div className="flex justify-between text-sm font-medium text-slate-500">
+                      <span>Package Price</span>
+                      <span className="text-slate-900 font-bold">Rs. {planInfo.price}</span>
                     </div>
-
-                    <button 
-                        onClick={() => navigate('/success')}
-                        disabled={!requirements || !address || !receipt || !date}
-                        className="w-full py-7 bg-[#00D1D1] text-black font-black uppercase text-[11px] rounded-[2rem] hover:scale-[1.03] active:scale-95 transition-all shadow-[0_20px_50px_rgba(0,209,209,0.3)] disabled:opacity-20 disabled:grayscale relative z-10"
-                    >
-                        Place Booking Request
-                    </button>
+                    <div className="flex justify-between text-sm font-medium text-slate-500">
+                      <span>Service Fee</span>
+                      <span className="text-slate-900 font-bold">Rs. {serviceFee}</span>
+                    </div>
+                    {addons.material && <div className="flex justify-between text-sm text-teal-600 font-bold"><span>+ Materials</span><span>Rs. 500</span></div>}
+                    {addons.express && <div className="flex justify-between text-sm text-teal-600 font-bold"><span>+ Express</span><span>Rs. 300</span></div>}
+                    <div className="h-[1px] bg-slate-100 my-4"></div>
+                    <div className="flex justify-between items-end">
+                        <span className="text-xs font-bold text-slate-400 uppercase">Total Payable</span>
+                        <span className="text-3xl font-black text-slate-900 leading-none tracking-tight">Rs. {totalPrice}</span>
+                    </div>
                 </div>
                 
-                <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-[2rem] flex items-center gap-4 group">
-                    <ShieldCheck size={24} className="text-emerald-500 group-hover:scale-110 transition-transform" />
-                    <p className="text-[9px] font-black uppercase text-emerald-500/80 tracking-widest leading-relaxed">
-                        Secure Escrow Protection: Your money is safe with us until the job is done.
-                    </p>
+                <div className="p-4 bg-teal-50/50 rounded-xl flex items-start gap-3 border border-teal-100">
+                    <Shield size={18} className="text-teal-600 shrink-0 mt-0.5" />
+                    <p className="text-[10px] font-bold text-teal-800 leading-relaxed uppercase tracking-tight">Your money is held safely in escrow and only released when the job is done.</p>
                 </div>
             </div>
         </div>

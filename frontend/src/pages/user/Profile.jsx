@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Layout, Calendar, Settings, Wallet, Bell, 
-  ChevronDown, LogOut, ShieldCheck, Menu
+  LogOut, ShieldCheck, Menu, Sparkles, ChevronRight
 } from 'lucide-react';
 import { axiosInstance } from '../../lib/axios';
 import toast from 'react-hot-toast';
@@ -20,15 +20,7 @@ const Profile = () => {
         const userId = userJson ? JSON.parse(userJson).id : null;
         if (!userId) return;
         const response = await axiosInstance.get(`/user/${userId}`);
-        console.log(response)
         setUserData(response.data);
-        toast("Please complete your profile details!", {
-    icon: 'ℹ️',
-    duration: 4000,
-    style: {
-      borderTop: '4px solid #3b82f6', // Info Blue
-    },
-  });
       } catch (err) {
         console.error("Profile Load Error:", err);
       } finally {
@@ -44,49 +36,51 @@ const Profile = () => {
   };
 
   if (loading) return (
-    <div className="h-screen bg-black flex flex-col items-center justify-center space-y-4">
-      <div className="w-12 h-12 border-4 border-[#00D1D1] border-t-transparent rounded-full animate-spin"></div>
-      <p className="text-[#00D1D1] font-black text-xs uppercase tracking-[0.3em]">Loading Account...</p>
+    <div className="h-screen bg-white flex flex-col items-center justify-center space-y-4">
+      <div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-teal-700 font-bold text-xs uppercase tracking-widest">Loading Account...</p>
     </div>
   );
 
   return (
-    <div className="flex min-h-screen bg-[#050505] font-['Inter'] text-white overflow-hidden">
+    <div className="flex min-h-screen bg-[#F8FAFB] font-sans text-slate-900 overflow-hidden">
       
       {/* --- SIDEBAR --- */}
-      <aside className="w-72 bg-[#0A0A0A] border-r border-white/5 flex flex-col shrink-0 relative z-20">
+      <aside className="w-72 bg-white border-r border-gray-100 flex flex-col shrink-0 relative z-20">
         {/* Brand Identity */}
-        <div className="p-8">
+        <div className="p-8 pb-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#00D1D1] rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(0,209,209,0.3)]">
-              <ShieldCheck size={20} className="text-black" />
+            <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center shadow-lg shadow-teal-100">
+              <ShieldCheck size={20} className="text-white" />
             </div>
-            <span className="text-xl font-black tracking-tighter italic">SMART<span className="text-[#00D1D1]">ROZGAR</span></span>
+            <span className="text-xl font-bold tracking-tight">Smart<span className="text-teal-600">Rozgar</span></span>
           </div>
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 px-4 space-y-2 mt-4">
-          <NavItem to="/profile" icon={<Layout size={20}/>} label="My Overview" end />
-          <NavItem to="/profile/tasks" icon={<Calendar size={20}/>} label="My Bookings" />
-          <NavItem to="/profile/wallet" icon={<Wallet size={20}/>} label="My Wallet" />
-          <NavItem to="/profile/settings" icon={<Settings size={20}/>} label="Account Settings" />
+        <nav className="flex-1 px-4 space-y-1.5 mt-8">
+          <NavItem to="/profile" icon={<Layout size={18}/>} label="Overview" end />
+          <NavItem to="/profile/tasks" icon={<Calendar size={18}/>} label="My Bookings" />
+          <NavItem to="/profile/wallet" icon={<Wallet size={18}/>} label="My Wallet" />
+          <NavItem to="/profile/settings" icon={<Settings size={18}/>} label="Settings" />
         </nav>
 
         {/* Sidebar Footer / Upgrade Card */}
         <div className="p-6">
-          <div className="bg-gradient-to-br from-[#111] to-black border border-white/10 p-5 rounded-[2rem] mb-6 relative overflow-hidden group">
-            <div className="absolute top-[-20%] right-[-20%] w-24 h-24 bg-[#00D1D1]/10 blur-2xl rounded-full"></div>
-            <p className="font-black text-[10px] text-[#00D1D1] uppercase tracking-widest mb-1">Go Premium</p>
-            <p className="text-gray-400 text-[11px] mb-4 leading-relaxed">Unlock verified badges and get faster support.</p>
-            <button className="w-full py-2.5 bg-white/5 hover:bg-[#00D1D1] hover:text-black border border-white/10 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest">Upgrade Now</button>
+          <div className="bg-teal-600 p-5 rounded-2xl mb-4 relative overflow-hidden group">
+            <Sparkles className="absolute top-2 right-2 text-teal-300 opacity-50" size={24} />
+            <p className="font-bold text-xs text-white uppercase tracking-wider mb-1">Go Premium</p>
+            <p className="text-teal-50 text-[11px] mb-4 opacity-90 leading-snug">Get verified badges and faster job matches.</p>
+            <button className="w-full py-2 bg-white text-teal-700 rounded-lg text-[10px] font-bold transition-all uppercase tracking-widest shadow-sm hover:bg-teal-50">
+              Upgrade
+            </button>
           </div>
           
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-3 py-4 bg-red-500/5 hover:bg-red-500/10 text-red-500 rounded-2xl transition-all text-xs font-black uppercase tracking-widest border border-red-500/10"
+            className="w-full flex items-center justify-center gap-2 py-3.5 bg-gray-50 hover:bg-red-50 hover:text-red-600 text-gray-500 rounded-xl transition-all text-xs font-bold uppercase tracking-widest border border-gray-100"
           >
-            <LogOut size={18} /> Logout
+            <LogOut size={16} /> Logout
           </button>
         </div>
       </aside>
@@ -94,45 +88,44 @@ const Profile = () => {
       {/* --- MAIN CONTENT --- */}
       <main className="flex-1 flex flex-col overflow-hidden relative">
         
-        {/* Background Subtle Glow */}
-        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#00D1D1]/5 blur-[120px] rounded-full pointer-events-none"></div>
-
         {/* Top Header */}
-        <header className="h-20 flex items-center justify-between px-10 bg-black/40 backdrop-blur-xl border-b border-white/5 shrink-0 z-10">
+        <header className="h-16 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md border-b border-gray-100 shrink-0 z-10">
           <div className="flex items-center gap-4">
-            <Menu className="text-gray-600 cursor-pointer hover:text-[#00D1D1]" size={20} />
-            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-gray-400">
-              {location.pathname === '/profile' ? 'Profile Overview' : 'Section / ' + location.pathname.split('/').pop()}
-            </h2>
+            <Menu className="text-gray-400 cursor-pointer hover:text-teal-600" size={20} />
+            <div className="flex items-center text-xs font-bold text-gray-400 uppercase tracking-widest">
+                <span>Account</span>
+                <ChevronRight size={14} className="mx-1" />
+                <span className="text-teal-600">
+                    {location.pathname === '/profile' ? 'Overview' : location.pathname.split('/').pop()}
+                </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6">
             {/* Notifications */}
-            <div className="relative group cursor-pointer p-2">
-              <Bell size={20} className="text-gray-400 group-hover:text-[#00D1D1] transition-colors" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-[#00D1D1] rounded-full shadow-[0_0_10px_#00D1D1]"></span>
+            <div className="relative cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition-colors group">
+              <Bell size={18} className="text-gray-400 group-hover:text-teal-600" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-teal-500 rounded-full ring-2 ring-white"></span>
             </div>
 
             {/* User Dropdown Profile */}
-            <div className="flex items-center gap-4 pl-6 border-l border-white/10">
+            <div className="flex items-center gap-3 pl-6 border-l border-gray-100">
               <div className="text-right hidden sm:block">
-                <p className="text-xs font-black text-white leading-none uppercase">{userData?.fullName?.split(' ')[0]}</p>
-                <p className="text-[10px] text-[#00D1D1] font-bold uppercase tracking-tighter mt-1">{userData?.role}</p>
+                <p className="text-[11px] font-bold text-slate-900 leading-none uppercase tracking-tight">{userData?.fullName?.split(' ')[0]}</p>
+                <p className="text-[9px] text-teal-600 font-bold uppercase mt-1 opacity-80">{userData?.role || 'Member'}</p>
               </div>
-              <div className="relative">
-                <img 
-                  src={userData?.profilePicture || `https://ui-avatars.com/api/?name=${userData?.fullName}&background=00D1D1&color=fff`} 
-                  className="w-10 h-10 rounded-xl object-cover ring-2 ring-white/5 group-hover:ring-[#00D1D1]/50 transition-all" 
-                  alt="Profile" 
-                />
-              </div>
+              <img 
+                src={userData?.profilePicture || `https://ui-avatars.com/api/?name=${userData?.fullName}&background=0d9488&color=fff`} 
+                className="w-9 h-9 rounded-xl object-cover border border-gray-100 shadow-sm" 
+                alt="Profile" 
+              />
             </div>
           </div>
         </header>
 
         {/* Scrollable Dashboard Body */}
-        <div className="flex-1 overflow-y-auto p-10 custom-scrollbar relative z-10">
-           <div className="max-w-6xl mx-auto">
+        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+           <div className="max-w-5xl mx-auto">
               <Outlet context={{ userData }} />
            </div>
         </div>
@@ -144,10 +137,10 @@ const Profile = () => {
 // Simplified Navigation Item Component
 const NavItem = ({ to, icon, label, end }) => (
   <NavLink to={to} end={end} className={({ isActive }) => 
-    `flex items-center gap-4 py-4 px-6 rounded-2xl transition-all text-[11px] font-black uppercase tracking-widest
+    `flex items-center gap-3 py-3 px-5 rounded-xl transition-all text-xs font-bold uppercase tracking-wider
     ${isActive 
-      ? 'bg-[#00D1D1] text-black shadow-[0_10px_20px_rgba(0,209,209,0.2)]' 
-      : 'hover:bg-white/5 text-gray-500 hover:text-white'}`
+      ? 'bg-teal-600 text-white shadow-md shadow-teal-100' 
+      : 'text-gray-400 hover:text-teal-600 hover:bg-teal-50/50'}`
   }>
     {icon} {label}
   </NavLink>

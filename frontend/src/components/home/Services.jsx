@@ -16,17 +16,17 @@ const services = [
 
 const Services = () => {
   return (
-    <section id="services" className="w-full bg-[#000000] font-['Inter'] py-20 px-4 lg:px-20">
+    <section id="services" className="w-full bg-[#F8FAFB] font-['Inter'] py-24 px-4 lg:px-20">
       <div className="max-w-7xl mx-auto">
         
         {/* Header */}
-        <div className="text-center mb-20" data-aos="fade-up">
-          <h2 className="text-4xl sm:text-6xl font-black mb-6 tracking-tight">
-            <span className="text-white">Professional</span> <span className="text-[#00D1D1]">Services</span>
+        <div className="text-center mb-16" data-aos="fade-up">
+          <h2 className="text-4xl sm:text-5xl font-[1000] mb-6 tracking-tight text-gray-900">
+            Professional <span className="text-[#008080]">Services</span>
           </h2>
-          <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="text-gray-500 text-lg max-w-2xl mx-auto leading-relaxed">
             Premium home maintenance solutions delivered by verified experts. 
-            <span className="text-white"> Efficiency meets excellence.</span>
+            <span className="text-[#008080] font-semibold"> Efficiency meets excellence.</span>
           </p>
         </div>
 
@@ -40,38 +40,35 @@ const Services = () => {
             >
               {/* Card Container */}
               <div 
-                className="relative bg-[#0A0A0A] border border-white/10 rounded-3xl p-6 h-full flex flex-col justify-center items-center overflow-hidden transition-all duration-500 cursor-pointer group-hover:border-[#00D1D1]/50 group-hover:bg-[#111111] group-hover:-translate-y-3"
+                className="relative bg-white border border-gray-100 rounded-[2.5rem] p-6 h-full flex flex-col justify-center items-center overflow-hidden transition-all duration-500 cursor-pointer shadow-sm hover:shadow-xl hover:shadow-[#008080]/10 hover:border-[#008080]/30 hover:-translate-y-2"
               >
-                {/* Background Glow Effect on Hover */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#00D1D1]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
-
                 {/* Icon Container */}
-                <div className="relative z-10 w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mb-4 border border-white/5 group-hover:scale-110 group-hover:bg-[#00D1D1]/10 group-hover:border-[#00D1D1]/20 transition-all duration-500">
+                <div className="relative z-10 w-20 h-20 rounded-2xl bg-[#008080]/5 flex items-center justify-center mb-4 transition-all duration-500 group-hover:scale-110 group-hover:bg-[#008080]/10">
                   <img 
                     src={service.icon} 
                     alt={service.name}
-                    className="w-12 h-12 object-contain brightness-0 invert opacity-70 group-hover:opacity-100 transition-all duration-500"
+                    className="w-12 h-12 object-contain transition-all duration-500 opacity-80 group-hover:opacity-100"
                     onError={(e) => {
-                        e.currentTarget.src = "https://placehold.co/48x48/121212/00D1D1/png?text=⚡";
+                        e.currentTarget.src = "https://placehold.co/48x48/F0F9F9/008080/png?text=🛠️";
                     }}
                   />
                 </div>
                 
                 {/* Service Name */}
-                <h3 className="relative z-10 text-center text-gray-300 font-bold text-sm sm:text-lg group-hover:text-white transition-colors tracking-wide">
+                <h3 className="relative z-10 text-center text-gray-700 font-bold text-sm sm:text-lg group-hover:text-[#008080] transition-colors tracking-tight">
                   {service.name}
                 </h3>
 
-                {/* Animated Bottom Bar */}
-                <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-[#00D1D1] to-[#008080] group-hover:w-full transition-all duration-500"></div>
+                {/* Subtle Glow Circle on Hover */}
+                <div className="absolute -bottom-12 -right-12 w-24 h-24 bg-[#008080]/5 rounded-full blur-2xl group-hover:bg-[#008080]/10 transition-all duration-500"></div>
               </div>
             </div>
           ))}
         </div>
 
         {/* Call to Action */}
-        <div className="text-center mt-20" data-aos="zoom-in">
-          <button className="group relative px-10 py-4 bg-transparent border-2 border-[#00D1D1] text-[#00D1D1] rounded-full font-bold text-lg hover:bg-[#00D1D1] hover:text-black transition-all duration-300 shadow-[0_0_20px_rgba(0,209,209,0.1)] hover:shadow-[0_0_30px_rgba(0,209,209,0.4)] flex items-center mx-auto gap-2">
+        <div className="text-center mt-16" data-aos="zoom-in">
+          <button className="group flex items-center mx-auto gap-3 px-10 py-4 bg-white border-2 border-[#008080] text-[#008080] rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-[#008080] hover:text-white transition-all duration-300 shadow-lg shadow-[#008080]/10">
             View All Categories
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>

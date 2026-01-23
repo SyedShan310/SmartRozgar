@@ -20,7 +20,7 @@ const UserRoutes = () => {
   const userRole = localStorage.getItem("role");
   return (
     <>
-    <Navbar />
+
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/contact" element={<ContactForm />} />

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, Eye, EyeOff, LogIn, ShieldCheck, Loader2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ShieldCheck, Loader2, ChevronRight } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import Lottie from 'lottie-react';
-import Logo from '/images/logo2.png'; 
 import { axiosInstance } from '../../lib/axios';
 import { useAuth } from '../../context/AuthContext';
 
@@ -32,7 +31,6 @@ export default function Login() {
       setError('Please enter your email and password');
       return;
     }
-
     setIsLoading(true);
     setError('');
 
@@ -49,141 +47,129 @@ export default function Login() {
   };
 
   return (
-    /* MAIN WRAPPER: 
-       'fixed inset-0' ensures it takes exactly the screen size.
-       'overflow-hidden' prevents the "page-level" scrollbar.
-    */
-    <section className="fixed inset-0 w-full h-[100dvh] bg-[#050505] flex items-center justify-center p-4 sm:p-6 font-['Inter'] overflow-hidden">
+    <section className="fixed inset-0 w-full h-[100dvh] bg-[#F8FAFC] flex items-center justify-center p-4 sm:p-6 font-['Inter'] overflow-hidden">
       
-      {/* Background Decorative Glows */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-[#00D1D1]/5 blur-[100px] rounded-full"></div>
-        <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] bg-[#00D1D1]/5 blur-[100px] rounded-full"></div>
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+           style={{ backgroundImage: `radial-gradient(#0D9488 1px, transparent 1px)`, backgroundSize: '30px 30px' }}>
       </div>
 
       {/* Main Login Card */}
-      <div className="max-w-5xl w-full bg-[#0A0A0A] border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden relative z-10">
+      <div className="max-w-5xl w-full bg-white border border-slate-200 rounded-[2rem] shadow-xl overflow-hidden relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           
-          {/* Left Side: Branding (Visible only on desktop) */}
-          <div className="hidden lg:flex bg-[#0D0D0D] p-12 flex-col justify-between relative border-r border-white/5">
-            <div>
-               <div className="flex items-center gap-2 text-[#00D1D1] mb-6 font-bold tracking-widest text-[10px] uppercase">
-                  <ShieldCheck size={16} /> Secure Login
+          {/* Left Side: Branding */}
+          <div className="hidden lg:flex bg-[#0D9488] p-16 flex-col justify-between relative overflow-hidden">
+            <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            
+            <div className="relative z-10">
+               <div className="flex items-center gap-2 text-teal-100 mb-8 font-bold tracking-widest text-[11px] uppercase">
+                  <ShieldCheck size={18} /> Verified Professional Network
                </div>
-               <h3 className="text-4xl font-black text-white mb-4 leading-tight">
-                 Welcome back to <br />
-                 <span className="text-[#00D1D1]">SmartRozgar</span>
+               <h3 className="text-4xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                 Empowering <br />
+                 Local Talent.
                </h3>
-               <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
-                 Log in to manage your profile and explore new opportunities.
+               <p className="text-teal-50/80 text-sm leading-relaxed max-w-xs font-medium">
+                 Log in to access your professional dashboard and connect with opportunities across Pakistan.
                </p>
             </div>
 
-            <div className="w-full max-w-[280px] mx-auto opacity-80">
+            <div className="w-full max-w-[280px] mx-auto py-8 relative z-10">
               {animationData && (
-                <Lottie 
-                  animationData={animationData} 
-                  loop={true} 
-                  className="w-full h-auto"
-                />
+                <Lottie animationData={animationData} loop={true} className="w-full h-auto" />
               )}
             </div>
 
-            <div className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">
-               Your security is our priority
+            <div className="text-[10px] text-teal-100/60 font-bold uppercase tracking-[0.2em] relative z-10">
+               © 2026 SmartRozgar Inc.
             </div>
           </div>
 
-          {/* Right Side: Login Form 
-             'overflow-y-auto' is ONLY added here for small mobile screens 
-             so the form doesn't get cut off if the screen is tiny.
-          */}
-          <div className="p-8 sm:p-12 lg:p-16 bg-black/40 backdrop-blur-xl max-h-[90vh] lg:max-h-none overflow-y-auto lg:overflow-visible">
-            <div className="max-w-sm mx-auto">
+          {/* Right Side: Login Form */}
+          <div className="p-8 sm:p-12 lg:p-20 flex flex-col justify-center bg-white">
+            <div className="max-w-sm mx-auto w-full">
               
-              {/* Brand Logo */}
-              <div className="text-center mb-10">
-                <img src={Logo} alt="SmartRozgar" className="h-10 mx-auto mb-4 brightness-0 invert opacity-90" />
-                <h2 className="text-2xl font-black text-white tracking-tight">Login</h2>
-                <p className="text-gray-500 text-xs mt-1">Please enter your details below</p>
+              {/* TEXT LOGO REPLACEMENT */}
+              <div className="text-center lg:text-left mb-10">
+                <div className="text-2xl font-black tracking-tighter mb-8 flex items-center justify-center lg:justify-start">
+                  <span className="text-slate-900">Smart</span>
+                  <span className="text-[#0D9488]">Rozgar</span>
+                </div>
+                
+                <h2 className="text-xl font-bold text-slate-800 tracking-tight">Login to Account</h2>
+                <p className="text-slate-500 text-xs mt-2 font-semibold">Welcome back! Please enter your details.</p>
               </div>
 
-              <div className="space-y-5">
+              <div className="space-y-6">
                 {error && (
-                  <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-xs font-medium text-center">
+                  <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-xs font-bold text-center">
                     {error}
                   </div>
                 )}
 
                 {/* Email Field */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Email Address</label>
-                  <div className="relative">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
+                  <div className="relative group">
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="example@mail.com"
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-white focus:outline-none focus:border-[#00D1D1] transition-all"
+                      placeholder="e.g. hassan@example.com"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 py-4 text-sm text-slate-900 focus:outline-none focus:border-[#0D9488] focus:bg-white transition-all placeholder:text-slate-400 font-medium"
                     />
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#0D9488] transition-colors" />
                   </div>
                 </div>
 
                 {/* Password Field */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Password</label>
-                  <div className="relative">
+                  <div className="flex justify-between items-center px-1">
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Password</label>
+                    <button type="button" className="text-[11px] font-bold text-[#0D9488] hover:text-teal-700 transition-colors">Forgot Password?</button>
+                  </div>
+                  <div className="relative group">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="••••••••"
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-12 py-4 text-white focus:outline-none focus:border-[#00D1D1] transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-12 py-4 text-sm text-slate-900 focus:outline-none focus:border-[#0D9488] focus:bg-white transition-all placeholder:text-slate-400 font-medium"
                     />
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#0D9488] transition-colors" />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-[#00D1D1]"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#0D9488]"
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between px-1">
-                  <label className="flex items-center gap-2 cursor-pointer group">
-                    <input type="checkbox" className="accent-[#00D1D1] bg-transparent border-white/10" />
-                    <span className="text-[11px] text-gray-500 font-medium">Remember me</span>
-                  </label>
-                  <button type="button" className="text-[11px] font-bold text-[#00D1D1] hover:underline underline-offset-4">
-                    Forgot Password?
-                  </button>
-                </div>
-
+                {/* Submit Button */}
                 <button
                   onClick={handleSubmit}
                   disabled={isLoading}
-                  className="w-full bg-[#00D1D1] hover:bg-[#00f2f2] disabled:bg-gray-800 text-black font-black py-4 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg active:scale-95 mt-2"
+                  className="w-full bg-[#0D9488] hover:bg-[#0b7a70] disabled:bg-slate-300 text-white font-black py-4 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-teal-600/10 active:scale-[0.98] mt-4 uppercase text-xs tracking-widest"
                 >
                   {isLoading ? (
                     <Loader2 className="animate-spin h-5 w-5" />
                   ) : (
                     <>
                       <span>Login</span>
-                      <LogIn size={18} />
+                      <ChevronRight size={18} />
                     </>
                   )}
                 </button>
 
                 <div className="text-center mt-8">
-                  <p className="text-gray-500 text-xs font-medium">
+                  <p className="text-slate-500 text-[12px] font-bold uppercase tracking-tight">
                     Don't have an account?{' '}
-                    <Link to="/signup" className="text-[#00D1D1] font-bold hover:underline">Sign up for SmartRozgar</Link>
+                    <Link to="/signup" className="text-[#0D9488] hover:text-teal-700 transition-all ml-1">Sign up for free</Link>
                   </p>
                 </div>
               </div>

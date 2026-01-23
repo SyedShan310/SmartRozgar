@@ -14,12 +14,12 @@ const reasons = [
   },
   {
     icon: Zap,
-    title: 'Quick Service Response',
-    description: 'We prioritize rapid response times to be at your doorstep quickly.',
+    title: 'Quick Response',
+    description: 'We prioritize rapid response times to be at your doorstep quickly when you need us.',
   },
   {
     icon: Shield,
-    title: 'Assured Safety & Warranty',
+    title: 'Safety & Warranty',
     description: 'All services come with a warranty and our staff adhere to strict safety protocols.',
   },
   {
@@ -36,25 +36,27 @@ const reasons = [
 
 const WhyChooseUs = () => {
   return (
-    <section id="why-choose-us" className="w-full font-['Inter'] py-24 bg-black overflow-hidden relative">
+    <section id="why-choose-us" className="w-full font-['Inter'] py-24 bg-white overflow-hidden relative">
       
-      {/* Background Decorative Elements */}
+      {/* Soft Background Decorative Elements */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#00D1D1]/5 blur-[120px] rounded-full"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#008080]/5 blur-[120px] rounded-full"></div>
+        <div className="absolute top-[-5%] left-[-5%] w-[30%] h-[30%] bg-[#008080]/5 blur-[100px] rounded-full"></div>
+        <div className="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-[#008080]/5 blur-[100px] rounded-full"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
         
         {/* Header */}
         <div className="text-center mb-20" data-aos="fade-up">
-          <h2 className="text-4xl sm:text-6xl font-black mb-6 tracking-tight">
-            <span className="text-white">Why Trust</span> <span className="text-[#00D1D1]">Us?</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#008080]/5 border border-[#008080]/10 rounded-full text-[#008080] text-xs font-black uppercase tracking-widest mb-6">
+             The SmartRozgar Advantage
+          </div>
+          <h2 className="text-4xl sm:text-6xl font-[1000] mb-6 tracking-tight text-gray-900 leading-tight">
+            Why Trust <span className="text-[#008080]">Us?</span>
           </h2>
-          <div className="w-24 h-1 bg-[#00D1D1] mx-auto rounded-full mb-8"></div>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
             We don't just fix things, we offer peace of mind. Experience the 
-            <span className="text-white"> gold standard</span> of home maintenance.
+            <span className="text-[#008080] font-bold"> gold standard</span> of home maintenance.
           </p>
         </div>
 
@@ -65,35 +67,33 @@ const WhyChooseUs = () => {
               key={index} 
               data-aos="fade-up"
               data-aos-delay={index * 100}
-              className="group relative p-8 rounded-[2.5rem] bg-[#0A0A0A] border border-white/5 transition-all duration-500 hover:border-[#00D1D1]/30 hover:bg-[#111111] hover:-translate-y-2"
+              className="group relative p-10 rounded-[2.5rem] bg-white border border-gray-100 transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,128,128,0.15)] hover:border-[#008080]/20 hover:-translate-y-2"
             >
-              {/* Top Right Corner Accent */}
-              <div className="absolute top-6 right-8 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="w-2 h-2 rounded-full bg-[#00D1D1] animate-pulse"></div>
-              </div>
-
               {/* Icon Container */}
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#00D1D1]/10 to-transparent flex items-center justify-center mb-6 border border-[#00D1D1]/20 group-hover:scale-110 group-hover:border-[#00D1D1]/50 transition-all duration-500">
-                <reason.icon className="w-8 h-8 text-[#00D1D1]" strokeWidth={1.5} />
+              <div className="w-16 h-16 rounded-2xl bg-[#008080]/5 flex items-center justify-center mb-8 border border-[#008080]/10 group-hover:bg-[#008080] transition-all duration-500 shadow-sm">
+                <reason.icon className="w-8 h-8 text-[#008080] group-hover:text-white transition-colors duration-500" strokeWidth={1.5} />
               </div>
               
-              <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#00D1D1] transition-colors">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-[#008080] transition-colors">
                 {reason.title}
               </h3>
-              <p className="text-gray-500 text-sm leading-relaxed group-hover:text-gray-300 transition-colors">
+              <p className="text-gray-500 text-sm leading-relaxed group-hover:text-gray-600 transition-colors">
                 {reason.description}
               </p>
 
-              {/* Hover Glow Effect */}
-              <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-b from-[#00D1D1]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              {/* Bottom Line Accent */}
+              <div className="absolute bottom-8 left-10 w-8 h-1 bg-gray-100 group-hover:w-16 group-hover:bg-[#008080] transition-all duration-500 rounded-full"></div>
             </div>
           ))}
         </div>
 
         {/* Bottom Trust Banner */}
-        <div className="mt-20 p-8 rounded-3xl border border-white/5 bg-gradient-to-r from-transparent via-white/5 to-transparent text-center" data-aos="zoom-in">
-            <p className="text-gray-400 text-sm uppercase tracking-[0.3em] font-semibold">
-                Trusted by over <span className="text-[#00D1D1]">50,000+</span> Households
+        <div className="mt-20 p-10 rounded-[2.5rem] bg-[#F8FAFB] border border-gray-100 text-center relative overflow-hidden" data-aos="zoom-in">
+            {/* Subtle Pattern Overlay */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+            
+            <p className="relative z-10 text-gray-400 text-xs sm:text-sm uppercase tracking-[0.4em] font-black">
+                Trusted by over <span className="text-[#008080] text-lg sm:text-xl ml-2">50,000+</span> Households
             </p>
         </div>
 
