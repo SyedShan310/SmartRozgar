@@ -1,137 +1,89 @@
-import React from 'react';
-import { 
-  User, Bell, Shield, CreditCard, Camera, 
-  ChevronRight, Lock, Globe, Smartphone, LogOut
-} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { User, Lock, Save, Loader2 } from 'lucide-react';
+import { axiosInstance } from '../../lib/axios';
+import { useAuth } from '../../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const TaskerSettings = () => {
-    return (
-        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
-            {/* PAGE HEADER */}
-            <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">Account Settings</h1>
-                <p className="text-slate-500 text-sm mt-1 font-medium uppercase tracking-widest">Manage your professional profile and security</p>
-            </div>
+  const { user } = useAuth();
+  const [profile, setProfile] = useState({ fullName: '', email: '', hourlyRate: '', skills: [] });
+  const [passwords, setPasswords] = useState({ current: '', new: '' });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-            {/* 1. PROFILE IDENTITY CARD */}
-            <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl overflow-hidden shadow-xl">
-                <div className="p-8 flex flex-col md:flex-row items-center gap-8">
-                    <div className="relative">
-                        <div className="w-24 h-24 bg-gradient-to-tr from-[#10b981] to-emerald-900 rounded-3xl flex items-center justify-center text-3xl font-black text-white shadow-2xl">
-                            DW
-                        </div>
-                        <button className="absolute -bottom-2 -right-2 p-2 bg-[#10b981] rounded-xl text-black border-4 border-[#0a0a0a] hover:scale-110 transition-transform shadow-lg">
-                            <Camera size={16} strokeWidth={3} />
-                        </button>
-                    </div>
-                    <div className="flex-1 text-center md:text-left">
-                        <h3 className="text-xl font-bold text-white mb-1 tracking-tight">Danna Williams</h3>
-                        <p className="text-sm text-slate-500 font-medium mb-4 uppercase tracking-tighter">Professional Residential Specialist</p>
-                        <div className="flex flex-wrap justify-center md:justify-start gap-2">
-                            <span className="px-3 py-1 bg-[#10b981]/10 text-[#10b981] text-[10px] font-black uppercase rounded-full border border-[#10b981]/20">Verified Pro</span>
-                            <span className="px-3 py-1 bg-white/5 text-slate-400 text-[10px] font-black uppercase rounded-full border border-white/10">Top 5% Tasker</span>
-                        </div>
-                    </div>
-                    <button className="px-6 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-xl border border-white/10 text-xs font-bold uppercase tracking-widest transition-all">
-                        Edit Profile
-                    </button>
-                </div>
-            </div>
+  useEffect(() => {
+    axiosInstance.get('/user/me/profile')
+      .then((res) => {
+        if (res.data.success) {
+          const u = res.data.user;
+          setProfile({ fullName: u.fullName || '', email: u.email || '', hourlyRate: u.hourlyRate || '', skills: u.skills || [] });
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-            {/* 2. SETTINGS GRID */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {/* PAYOUT DETAILS (Crucial for your manual transfers) */}
-                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-6 space-y-4 shadow-sm">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 bg-blue-500/10 rounded-lg"><CreditCard className="text-blue-400 w-5 h-5" /></div>
-                        <h4 className="text-sm font-bold text-white uppercase tracking-widest">Payout Destination</h4>
-                    </div>
-                    <p className="text-[11px] text-slate-500 leading-relaxed font-medium uppercase tracking-tighter">
-                        This information is used by the Admin to process your manual withdrawals.
-                    </p>
-                    <div className="p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group cursor-pointer hover:border-blue-500/30 transition-all">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-[10px] font-black italic text-slate-300">BANK</div>
-                            <div>
-                                <p className="text-xs font-bold text-white tracking-tight">Chase Bank •••• 4291</p>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Primary Method</p>
-                            </div>
-                        </div>
-                        <ChevronRight size={16} className="text-slate-600 group-hover:text-white transition-colors" />
-                    </div>
-                    <button className="w-full py-3 border border-dashed border-white/10 rounded-2xl text-[10px] font-black text-slate-500 uppercase tracking-widest hover:border-white/20 hover:text-white transition-all">
-                        + Add Payout Account
-                    </button>
-                </div>
+  const saveProfile = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const res = await axiosInstance.put(`/taskers/${user.id}`, {
+        fullName: profile.fullName,
+        email: profile.email,
+        hourlyRate: parseInt(profile.hourlyRate),
+      });
+      if (res.data.success) toast.success('Profile updated!');
+    } catch { toast.error('Failed to update profile'); }
+    finally { setSaving(false); }
+  };
 
-                {/* NOTIFICATIONS SETTINGS */}
-                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-6 space-y-4 shadow-sm">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 bg-amber-500/10 rounded-lg"><Bell className="text-amber-400 w-5 h-5" /></div>
-                        <h4 className="text-sm font-bold text-white uppercase tracking-widest">Alert Preferences</h4>
-                    </div>
-                    <div className="space-y-3">
-                        {[
-                            { label: 'Job Request Alerts', enabled: true },
-                            { label: 'Payment Clearances', enabled: true },
-                            { label: 'Chat Notifications', enabled: false }
-                        ].map((item, idx) => (
-                            <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
-                                <span className="text-[11px] font-bold text-slate-300 uppercase tracking-tighter">{item.label}</span>
-                                <div className={`w-8 h-4 rounded-full relative cursor-pointer transition-colors ${item.enabled ? 'bg-[#10b981]' : 'bg-slate-800'}`}>
-                                    <div className={`absolute top-1 w-2 h-2 rounded-full bg-white shadow-sm transition-all ${item.enabled ? 'right-1' : 'left-1'}`}></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+  const changePassword = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await axiosInstance.patch('/auth/password', { currentPassword: passwords.current, newPassword: passwords.new });
+      toast.success('Password changed!');
+      setPasswords({ current: '', new: '' });
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed to change password'); }
+    finally { setSaving(false); }
+  };
 
-            </div>
+  if (loading) return (
+    <div className="flex justify-center py-32"><Loader2 className="animate-spin text-teal-600" size={32} /></div>
+  );
 
-            {/* 3. SECURITY & PRIVACY */}
-            <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-8">
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 bg-red-500/10 rounded-lg"><Shield className="text-red-400 w-5 h-5" /></div>
-                    <h4 className="text-sm font-bold text-white uppercase tracking-widest">Security & Protocol</h4>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <button className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all group">
-                        <div className="flex items-center gap-3">
-                            <Lock size={16} className="text-slate-500 group-hover:text-white transition-colors" />
-                            <span className="text-[11px] font-bold text-white uppercase tracking-widest">Update Password</span>
-                        </div>
-                        <ChevronRight size={14} className="text-slate-700 group-hover:text-white" />
-                    </button>
-                    <button className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all group">
-                        <div className="flex items-center gap-3">
-                            <Smartphone size={16} className="text-slate-500 group-hover:text-white transition-colors" />
-                            <span className="text-[11px] font-bold text-white uppercase tracking-widest">Two-Factor Auth</span>
-                        </div>
-                        <ChevronRight size={14} className="text-slate-700 group-hover:text-white" />
-                    </button>
-                    <button className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all group">
-                        <div className="flex items-center gap-3">
-                            <Globe size={16} className="text-slate-500 group-hover:text-white transition-colors" />
-                            <span className="text-[11px] font-bold text-white uppercase tracking-widest">Privacy Settings</span>
-                        </div>
-                        <ChevronRight size={14} className="text-slate-700 group-hover:text-white" />
-                    </button>
-                    <button className="flex items-center justify-between p-4 bg-red-500/5 border border-red-500/10 rounded-2xl hover:bg-red-500/10 transition-all group">
-                        <div className="flex items-center gap-3">
-                            <LogOut size={16} className="text-red-400" />
-                            <span className="text-[11px] font-bold text-red-400 uppercase tracking-widest">Terminate Session</span>
-                        </div>
-                    </button>
-                </div>
-            </div>
+  return (
+    <div className="max-w-2xl mx-auto space-y-8 pb-20">
+      <h1 className="text-3xl font-black text-slate-800">Account Settings</h1>
 
-            {/* SYSTEM FOOTER */}
-            <div className="text-center pt-4">
-                <p className="text-[10px] text-slate-600 font-black uppercase tracking-[0.2em]">Tasker Dashboard Version 2.4.0 • 2026 Operations</p>
-            </div>
+      <form onSubmit={saveProfile} className="bg-white border border-slate-100 rounded-2xl p-8 space-y-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-2">
+          <User size={20} className="text-teal-600" />
+          <h3 className="font-bold text-lg">Profile</h3>
         </div>
-    );
+        <input value={profile.fullName} onChange={(e) => setProfile({ ...profile, fullName: e.target.value })} placeholder="Full Name" className="w-full border border-slate-200 rounded-xl p-3 text-sm outline-none focus:border-teal-500" />
+        <input value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} placeholder="Email" className="w-full border border-slate-200 rounded-xl p-3 text-sm outline-none focus:border-teal-500" />
+        <input type="number" value={profile.hourlyRate} onChange={(e) => setProfile({ ...profile, hourlyRate: e.target.value })} placeholder="Hourly Rate (PKR)" className="w-full border border-slate-200 rounded-xl p-3 text-sm outline-none focus:border-teal-500" />
+        <div className="flex flex-wrap gap-2">
+          {profile.skills.map((s) => (
+            <span key={s} className="px-3 py-1 bg-teal-50 text-teal-600 text-[10px] font-black uppercase rounded-lg border border-teal-100">{s}</span>
+          ))}
+        </div>
+        <button type="submit" disabled={saving} className="flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-xl text-xs font-black uppercase disabled:opacity-50">
+          <Save size={16} /> Save Profile
+        </button>
+      </form>
+
+      <form onSubmit={changePassword} className="bg-white border border-slate-100 rounded-2xl p-8 space-y-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-2">
+          <Lock size={20} className="text-teal-600" />
+          <h3 className="font-bold text-lg">Change Password</h3>
+        </div>
+        <input type="password" value={passwords.current} onChange={(e) => setPasswords({ ...passwords, current: e.target.value })} placeholder="Current Password" className="w-full border border-slate-200 rounded-xl p-3 text-sm outline-none focus:border-teal-500" />
+        <input type="password" value={passwords.new} onChange={(e) => setPasswords({ ...passwords, new: e.target.value })} placeholder="New Password" className="w-full border border-slate-200 rounded-xl p-3 text-sm outline-none focus:border-teal-500" />
+        <button type="submit" disabled={saving} className="px-6 py-3 bg-slate-800 text-white rounded-xl text-xs font-black uppercase disabled:opacity-50">Update Password</button>
+      </form>
+    </div>
+  );
 };
 
 export default TaskerSettings;

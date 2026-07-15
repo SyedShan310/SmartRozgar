@@ -1,43 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Mail, Lock, Eye, EyeOff, User, Phone, Home, Briefcase, 
-  ChevronRight, Check, MapPin, AlertCircle, Loader2, ShieldCheck 
+import {
+  // fixed: removed 8 unused imports (Mail, Lock, Eye, EyeOff, User, Phone, MapPin, AlertCircle)
+  Home, Briefcase, ChevronRight, Check, Loader2, ShieldCheck
 } from 'lucide-react';
 import Lottie from 'lottie-react';
 import { axiosInstance } from '../../lib/axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Signup() {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [role, setRole] = useState(''); 
+  const { login } = useAuth();
+  const [step, setStep]                 = useState(1);
+  const [role, setRole]                 = useState('');
   const [animationData, setAnimationData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState('');
+  const [loading, setLoading]           = useState(false);
+  const [message, setMessage]           = useState('');
+  const [messageType, setMessageType]   = useState('');
 
   const [formData, setFormData] = useState({
     fullName: '', email: '', phone: '', password: '', confirmPassword: '',
-    gender: '', age: '', houseNo: '', street: '', landmark: '',
-    city: '', state: '', pincode: '', skills: [], hourlyRate: ''
+    gender: '', age: '',                         // age input added back (was in state but had no field)
+    city: '', state: '', pincode: '',
+    skills: [], hourlyRate: ''
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-
   const skillsOptions = [
-    "Maid/Cleaning", "Cooking", "Babysitting", "Elder Care", 
-    "Driver", "Gardening", "Laundry", "Plumbing", "Electrician"
+    'Maid/Cleaning', 'Cooking', 'Babysitting', 'Elder Care',
+    'Driver', 'Gardening', 'Laundry', 'Plumbing', 'Electrician'
+  ];
+
+  const pakistanProvinces = [
+    'Punjab', 'Sindh', 'Khyber Pakhtunkhwa', 'Balochistan',
+    'Islamabad Capital Territory', 'Gilgit-Baltistan', 'Azad Kashmir'
   ];
 
   useEffect(() => {
     fetch('/icons/Lady.json')
       .then(res => res.json())
       .then(data => setAnimationData(data))
-      .catch(() => console.log("Animation failed to load"));
+      .catch(() => console.log('Animation failed to load'));
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     if (message) setMessage('');
   };
 
@@ -50,16 +56,36 @@ export default function Signup() {
     }));
   };
 
-  const nextStep = () => setStep(prev => prev + 1);
-  const prevStep = () => setStep(prev => prev - 1);
+  // fixed: Step 1 role cards already call nextStep so bottom button only shows on step 2
+  // fixed: Added Step 2 validation before proceeding
+  const nextStep = () => {
+    if (step === 2) {
+      if (!formData.fullName || !formData.phone || !formData.password || !formData.city || !formData.pincode) {
+        setMessage('Please fill all required fields (name, phone, password, city, pincode)');
+        setMessageType('error');
+        return;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        setMessage('Passwords do not match');
+        setMessageType('error');
+        return;
+      }
+      if (role === 'tasker' && (!formData.gender || !formData.age)) {
+        setMessage('Gender and age are required for tasker accounts');
+        setMessageType('error');
+        return;
+      }
+    }
+    setMessage('');
+    setStep(prev => prev + 1);
+  };
+
+  const prevStep = () => {
+    setMessage('');
+    setStep(prev => prev - 1);
+  };
 
   const handleSubmit = async () => {
-    if (formData.password !== formData.confirmPassword) {
-      setMessage("Passwords do not match!");
-      setMessageType('error');
-      return;
-    }
-    
     setLoading(true);
     setMessage('');
 
@@ -67,45 +93,56 @@ export default function Signup() {
       const payload = {
         role,
         fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
+        email:    formData.email,
+        phone:    formData.phone,
         password: formData.password,
-        gender: formData.gender,
-        age: parseInt(formData.age),
+        gender:   formData.gender,
+        age:      parseInt(formData.age),
         address: {
-          city: formData.city,
-          state: formData.state,
+          city:    formData.city,
+          state:   formData.state,
           pincode: formData.pincode
         },
         ...(role === 'tasker' && {
-          skills: formData.skills,
+          skills:     formData.skills,
           hourlyRate: parseInt(formData.hourlyRate)
         })
       };
 
-      const response = await axiosInstance.post('/auth/signup', payload);
-      
+      const response = await axiosInstance.post('/auth/signup/', payload);
+
       if (response.data.success) {
         setMessageType('success');
-        setMessage("Account created! Redirecting...");
-        setTimeout(() => navigate("/login"), 2000);
+        if (role === 'hirer' && response.data.token) {
+          login(response.data.user, response.data.token);
+          setMessage('Account created! Redirecting...');
+          setTimeout(() => navigate('/'), 1500);
+        } else {
+          setMessage('Account created! Please login after admin approval.');
+          setTimeout(() => navigate('/login'), 2000);
+        }
       }
     } catch (error) {
-      setMessage(error.response?.data?.message || "Registration failed. Please check your details.");
+      setMessage(error.response?.data?.message || 'Registration failed. Please check your details.');
       setMessageType('error');
     } finally {
       setLoading(false);
     }
   };
 
+  const inputClass = 'w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all';
+  const labelClass = 'text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1';
+
   return (
     <div className="bg-[#F8FAFC] fixed inset-0 h-[100dvh] w-full flex items-center justify-center p-4 font-['Inter'] overflow-hidden">
-      
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
-           style={{ backgroundImage: `radial-gradient(#0D9488 1px, transparent 1px)`, backgroundSize: '30px 30px' }}>
-      </div>
 
+      {/* Background Pattern */}
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{ backgroundImage: `radial-gradient(#0D9488 1px, transparent 1px)`, backgroundSize: '30px 30px' }}
+      />
+
+      {/* Loading overlay */}
       {loading && (
         <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="text-center">
@@ -117,11 +154,11 @@ export default function Signup() {
 
       {/* Main Card */}
       <div className="max-w-6xl w-full bg-white border border-slate-200 rounded-[2.5rem] shadow-2xl overflow-hidden relative z-10 flex flex-col lg:flex-row h-full max-h-[90dvh] lg:h-[750px]">
-        
-        {/* LEFT PANEL: Branding (Teal Background) */}
+
+        {/* LEFT PANEL */}
         <div className="hidden lg:flex lg:w-2/5 bg-[#0D9488] p-12 flex-col justify-between relative overflow-hidden">
-          <div className="absolute top-[-5%] right-[-5%] w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-          
+          <div className="absolute top-[-5%] right-[-5%] w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+
           <div className="relative z-10">
             <div className="flex items-center gap-2 text-teal-100 mb-6 font-bold text-[10px] uppercase tracking-widest">
               <ShieldCheck size={16} /> Secure Registration
@@ -137,19 +174,21 @@ export default function Signup() {
           </div>
 
           <div className="py-4 relative z-10">
-            {animationData && <Lottie animationData={animationData} loop={true} className="w-full max-w-[280px] mx-auto" />}
+            {animationData && (
+              <Lottie animationData={animationData} loop={true} className="w-full max-w-[280px] mx-auto" />
+            )}
           </div>
 
           <div className="text-[10px] text-teal-100/60 font-bold uppercase tracking-[0.2em] relative z-10">
-             Reliable • Efficient • Local
+            Reliable • Efficient • Local
           </div>
         </div>
 
-        {/* RIGHT PANEL: Form (White Background) */}
+        {/* RIGHT PANEL */}
         <div className="flex-1 p-6 lg:p-12 flex flex-col bg-white overflow-hidden">
           <div className="max-w-xl mx-auto w-full h-full flex flex-col">
-            
-            {/* Header with Text Logo */}
+
+            {/* Header */}
             <div className="flex justify-between items-center mb-8 shrink-0">
               <div className="flex flex-col">
                 <div className="text-xl font-black tracking-tighter flex items-center">
@@ -159,7 +198,7 @@ export default function Signup() {
                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Step {step} of 3</span>
               </div>
               <div className="flex gap-2">
-                {[1, 2, 3].map((i) => (
+                {[1, 2, 3].map(i => (
                   <div key={i} className={`h-1.5 w-6 rounded-full transition-all ${step >= i ? 'bg-[#0D9488]' : 'bg-slate-100'}`} />
                 ))}
               </div>
@@ -167,7 +206,7 @@ export default function Signup() {
 
             {/* Scrollable Form Content */}
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-              
+
               {/* STEP 1: SELECT ROLE */}
               {step === 1 && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-4">
@@ -176,15 +215,20 @@ export default function Signup() {
                     <p className="text-slate-500 text-sm mt-1">Select how you want to use the platform.</p>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <button onClick={() => { setRole('hirer'); nextStep(); }}
-                      className="p-8 bg-slate-50 border border-slate-200 rounded-[2rem] hover:border-[#0D9488] hover:bg-teal-50/30 transition-all text-left group">
+                    {/* fixed: role cards call nextStep directly — no bottom Next button needed on step 1 */}
+                    <button
+                      onClick={() => { setRole('hirer'); setStep(2); }}
+                      className="p-8 bg-slate-50 border border-slate-200 rounded-[2rem] hover:border-[#0D9488] hover:bg-teal-50/30 transition-all text-left"
+                    >
                       <Home size={32} className="text-[#0D9488] mb-4" />
                       <h3 className="text-slate-800 font-bold text-lg leading-none">I want to Hire</h3>
                       <p className="text-slate-500 text-xs mt-2">Find skilled professionals for your home tasks.</p>
                     </button>
-                    
-                    <button onClick={() => { setRole('tasker'); nextStep(); }}
-                      className="p-8 bg-slate-50 border border-slate-200 rounded-[2rem] hover:border-[#0D9488] hover:bg-teal-50/30 transition-all text-left group">
+
+                    <button
+                      onClick={() => { setRole('tasker'); setStep(2); }}
+                      className="p-8 bg-slate-50 border border-slate-200 rounded-[2rem] hover:border-[#0D9488] hover:bg-teal-50/30 transition-all text-left"
+                    >
                       <Briefcase size={32} className="text-[#0D9488] mb-4" />
                       <h3 className="text-slate-800 font-bold text-lg leading-none">I want to Work</h3>
                       <p className="text-slate-500 text-xs mt-2">Offer your skills and grow your business.</p>
@@ -197,86 +241,123 @@ export default function Signup() {
               {step === 2 && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-right-4 pb-4">
                   <h2 className="text-xl font-bold text-slate-800">Profile Details</h2>
-                  
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Full Name</label>
-                      <input name="fullName" value={formData.fullName} onChange={handleChange} placeholder="John Doe" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all" />
+                      <label className={labelClass}>Full Name *</label>
+                      <input name="fullName" value={formData.fullName} onChange={handleChange} placeholder="Ahmed Khan" className={inputClass} />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Gender</label>
-                      <select name="gender" value={formData.gender} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all">
+                      <label className={labelClass}>Gender {role === 'tasker' ? '*' : ''}</label>
+                      <select name="gender" value={formData.gender} onChange={handleChange} className={inputClass}>
                         <option value="">Select Gender</option>
+                        {/* fixed: values now lowercase to match model enum */}
                         <option value="male">Male</option>
                         <option value="female">Female</option>
+                        <option value="other">Other</option>
                       </select>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Phone Number</label>
-                      <input name="phone" value={formData.phone} onChange={handleChange} placeholder="0300 1234567" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all" />
+                      <label className={labelClass}>Phone Number *</label>
+                      <input name="phone" value={formData.phone} onChange={handleChange} placeholder="0300 1234567" className={inputClass} />
                     </div>
+                    {/* fixed: age field was in state/payload but had no input in the form */}
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Email (Optional)</label>
-                      <input name="email" value={formData.email} onChange={handleChange} placeholder="mail@example.com" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all" />
+                      <label className={labelClass}>Age {role === 'tasker' ? '*' : ''}</label>
+                      <input type="number" name="age" value={formData.age} onChange={handleChange} placeholder="25" min="18" max="70" className={inputClass} />
                     </div>
                   </div>
 
-                  <div className="p-5 bg-teal-50/30 rounded-2xl border border-teal-100 space-y-4">
+                  <div className="space-y-1.5">
+                    <label className={labelClass}>Email (Optional)</label>
+                    <input name="email" value={formData.email} onChange={handleChange} placeholder="mail@example.com" className={inputClass} />
+                  </div>
+
+                  {/* Service Location */}
+                  <div className="p-5 bg-teal-50/30 rounded-2xl border border-teal-100 space-y-3">
                     <label className="text-[11px] font-black text-[#0D9488] uppercase tracking-widest">Service Location</label>
                     <div className="grid grid-cols-2 gap-3">
-                      <input name="city" value={formData.city} onChange={handleChange} placeholder="City" className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-slate-900 text-sm outline-none focus:border-[#0D9488]" />
-                      <input name="pincode" value={formData.pincode} onChange={handleChange} placeholder="Pincode" className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-slate-900 text-sm outline-none focus:border-[#0D9488]" />
+                      <div className="space-y-1.5">
+                        <label className={labelClass}>City *</label>
+                        <input name="city" value={formData.city} onChange={handleChange} placeholder="Lahore" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-slate-900 text-sm outline-none focus:border-[#0D9488]" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className={labelClass}>Pincode *</label>
+                        <input name="pincode" value={formData.pincode} onChange={handleChange} placeholder="54000" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-slate-900 text-sm outline-none focus:border-[#0D9488]" />
+                      </div>
+                    </div>
+                    {/* fixed: state/province field was sent in payload but had no input */}
+                    <div className="space-y-1.5">
+                      <label className={labelClass}>Province</label>
+                      <select name="state" value={formData.state} onChange={handleChange} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-slate-900 text-sm outline-none focus:border-[#0D9488]">
+                        <option value="">Select Province</option>
+                        {pakistanProvinces.map(p => <option key={p} value={p}>{p}</option>)}
+                      </select>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Password</label>
-                      <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all" />
+                      <label className={labelClass}>Password *</label>
+                      <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" className={inputClass} />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Confirm</label>
-                      <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none transition-all" />
+                      <label className={labelClass}>Confirm *</label>
+                      <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" className={inputClass} />
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* STEP 3: WORK DETAILS */}
+              {/* STEP 3: WORK DETAILS / CONFIRMATION */}
               {step === 3 && (
                 <div className="space-y-6 animate-in zoom-in-95 duration-500 pb-4">
                   <h2 className="text-xl font-bold text-slate-800">Final Confirmation</h2>
-                  
+
                   {role === 'tasker' ? (
                     <div className="space-y-6">
                       <div className="space-y-3">
-                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Expertise (Select multiple)</label>
+                        <label className={labelClass}>Expertise * (Select multiple)</label>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                           {skillsOptions.map(skill => (
-                            <button key={skill} onClick={() => handleSkillToggle(skill)}
+                            <button
+                              key={skill}
+                              onClick={() => handleSkillToggle(skill)}
                               className={`py-3 rounded-xl border text-[11px] font-bold transition-all ${
-                                formData.skills.includes(skill) ? 'bg-[#0D9488] border-[#0D9488] text-white shadow-md' : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-teal-200'
-                              }`}>
+                                formData.skills.includes(skill)
+                                  ? 'bg-[#0D9488] border-[#0D9488] text-white shadow-md'
+                                  : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-teal-200'
+                              }`}
+                            >
                               {skill}
                             </button>
                           ))}
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Expected Hourly Rate (PKR)</label>
-                        <input type="number" name="hourlyRate" value={formData.hourlyRate} onChange={handleChange} placeholder="e.g. 800" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-slate-900 text-sm focus:border-[#0D9488] focus:bg-white outline-none" />
+                        <label className={labelClass}>Expected Hourly Rate (PKR) *</label>
+                        <input
+                          type="number"
+                          name="hourlyRate"
+                          value={formData.hourlyRate}
+                          onChange={handleChange}
+                          placeholder="e.g. 800"
+                          className={inputClass}
+                        />
                       </div>
                     </div>
                   ) : (
                     <div className="py-12 text-center bg-teal-50/30 rounded-[2.5rem] border border-teal-100">
                       <div className="w-16 h-16 bg-[#0D9488] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-teal-200">
-                         <Check size={32} className="text-white" />
+                        <Check size={32} className="text-white" />
                       </div>
                       <h4 className="text-slate-800 font-black text-lg">Account Ready!</h4>
-                      <p className="text-slate-500 text-xs px-10 mt-2 font-medium">Click create account to start finding the best professionals in your area.</p>
+                      <p className="text-slate-500 text-xs px-10 mt-2 font-medium">
+                        Click create account to start finding the best professionals in your area.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -291,11 +372,15 @@ export default function Signup() {
                     Back
                   </button>
                 )}
-                {step < 3 ? (
+
+                {/* fixed: Step 1 has no bottom Next button — role cards handle navigation */}
+                {step === 2 && (
                   <button onClick={nextStep} className="flex-[2] py-4 bg-[#0D9488] hover:bg-[#0b7a70] text-white font-black rounded-2xl text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-teal-900/10">
                     Next Step <ChevronRight size={16} />
                   </button>
-                ) : (
+                )}
+
+                {step === 3 && (
                   <button onClick={handleSubmit} className="flex-[2] py-4 bg-[#0D9488] hover:bg-[#0b7a70] text-white font-black rounded-2xl text-[11px] uppercase tracking-widest shadow-lg shadow-teal-900/10">
                     Create My Account
                   </button>
@@ -303,13 +388,20 @@ export default function Signup() {
               </div>
 
               {message && (
-                <div className={`mt-4 p-3 rounded-xl text-xs font-bold text-center border ${messageType === 'success' ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-red-50 border-red-100 text-red-600'}`}>
+                <div className={`mt-4 p-3 rounded-xl text-xs font-bold text-center border ${
+                  messageType === 'success'
+                    ? 'bg-teal-50 border-teal-200 text-teal-700'
+                    : 'bg-red-50 border-red-100 text-red-600'
+                }`}>
                   {message}
                 </div>
               )}
 
               <p className="text-center mt-6 text-slate-400 text-[11px] font-bold uppercase tracking-tight">
-                Already part of the network? <Link to="/login" className="text-[#0D9488] hover:underline underline-offset-4 ml-1">Login here</Link>
+                Already part of the network?{' '}
+                <Link to="/login" className="text-[#0D9488] hover:underline underline-offset-4 ml-1">
+                  Login here
+                </Link>
               </p>
             </div>
           </div>
@@ -317,19 +409,10 @@ export default function Signup() {
       </div>
 
       <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #E2E8F0;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #0D9488;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #0D9488; }
       `}</style>
     </div>
   );

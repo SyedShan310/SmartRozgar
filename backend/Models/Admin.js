@@ -1,9 +1,11 @@
-// models/Admin.js
-const adminSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
-});
+import mongoose from 'mongoose';
 
-module.exports = mongoose.model('Admin', adminSchema);
+const adminSchema = new mongoose.Schema({
+  fullName:    { type: String, required: true },
+  email:       { type: String, required: true, unique: true, lowercase: true },
+  phoneNumber: { type: String, unique: true, sparse: true },
+  password:    { type: String, required: true },
+  role:        { type: String, default: 'admin' },
+}, { timestamps: true });
+
+export default mongoose.model('Admin', adminSchema);

@@ -1,22 +1,23 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const services = [
-  { id: 1, name: 'AC Services', icon: '/icons/ac-service.png' },
-  { id: 2, name: 'Plumber', icon: '/icons/plumber_icon.png' },
-  { id: 3, name: 'Electrician', icon: '/icons/electrician.png' },
-  { id: 4, name: 'Handyman', icon: '/icons/technician.png' },
-  { id: 5, name: 'Carpenter', icon: '/icons/carpenter.png' },
-  { id: 6, name: 'Painter', icon: 'icons/painter.png' },
-  { id: 7, name: 'Home Appliances', icon: '/icons/repair.png' },
-  { id: 8, name: 'Geyser', icon: '/icons/geyser.png' },
-  { id: 9, name: 'Pest Control', icon: '/icons/pest-control.png' },
-  { id: 10, name: 'Makeup Artist', icon: '/icons/makeupartist.png' },
+  { id: 1, name: 'AC Services', slug: 'ac', icon: '/icons/ac-service.png' },
+  { id: 2, name: 'Plumber', slug: 'plumber', icon: '/icons/plumber_icon.png' },
+  { id: 3, name: 'Electrician', slug: 'electrician', icon: '/icons/electrician.png' },
+  { id: 4, name: 'Handyman', slug: 'handyman', icon: '/icons/technician.png' },
+  { id: 5, name: 'Carpenter', slug: 'carpenter', icon: '/icons/carpenter.png' },
+  { id: 6, name: 'Painter', slug: 'painter', icon: '/icons/painter.png' },
+  { id: 7, name: 'Cleaning', slug: 'cleaning', icon: '/icons/repair.png' },
+  { id: 8, name: 'Geyser', slug: 'geyser', icon: '/icons/geyser.png' },
+  { id: 9, name: 'Pest Control', slug: 'pest', icon: '/icons/pest-control.png' },
+  { id: 10, name: 'Cooking', slug: 'cooking', icon: '/icons/makeupartist.png' },
 ];
 
 const Services = () => {
   return (
-    <section id="services" className="w-full bg-[#F8FAFB] font-['Inter'] py-24 px-4 lg:px-20">
+    <section id="services" className="w-full bg-[#f6f7f8] font-['Inter'] py-24 px-4 lg:px-20">
       <div className="max-w-7xl mx-auto">
         
         {/* Header */}
@@ -33,12 +34,12 @@ const Services = () => {
         {/* Services Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8">
           {services.map((service) => (
-            <div
+            <Link
               key={service.id}
+              to={`/services/${service.slug}`}
               data-aos="fade-up"
-              className="group relative h-48 sm:h-56"
+              className="group relative h-48 sm:h-56 block"
             >
-              {/* Card Container */}
               <div 
                 className="relative bg-white border border-gray-100 rounded-[2.5rem] p-6 h-full flex flex-col justify-center items-center overflow-hidden transition-all duration-500 cursor-pointer shadow-sm hover:shadow-xl hover:shadow-[#008080]/10 hover:border-[#008080]/30 hover:-translate-y-2"
               >
@@ -62,16 +63,18 @@ const Services = () => {
                 {/* Subtle Glow Circle on Hover */}
                 <div className="absolute -bottom-12 -right-12 w-24 h-24 bg-[#008080]/5 rounded-full blur-2xl group-hover:bg-[#008080]/10 transition-all duration-500"></div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
         {/* Call to Action */}
         <div className="text-center mt-16" data-aos="zoom-in">
-          <button className="group flex items-center mx-auto gap-3 px-10 py-4 bg-white border-2 border-[#008080] text-[#008080] rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-[#008080] hover:text-white transition-all duration-300 shadow-lg shadow-[#008080]/10">
+        <Link to={"/services"}>
+        <button className="group flex items-center mx-auto gap-3 px-10 py-4 bg-white border-2 border-[#008080] text-[#008080] rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-[#008080] hover:text-white transition-all duration-300 shadow-lg shadow-[#008080]/10">
             View All Categories
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
+        </Link>
         </div>
       </div>
     </section>

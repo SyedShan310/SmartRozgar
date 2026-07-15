@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Phone } from 'lucide-react';
+import { Search, PlusCircle, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-// Make sure these images exist in your public/images folder
 const sliderImages = [
   "/images/cleaning-service2.jpg", 
   "/images/electrician-service.jpg",
@@ -11,84 +11,85 @@ const sliderImages = [
 ];
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const totalImages = sliderImages.length;
   const slidePercentage = 100 / totalImages;
 
-  // Auto-advance slider every 2.5 seconds for a smoother feel
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % totalImages);
-    }, 2500);
+    }, 3500); // Slightly slower for a more professional feel
     return () => clearInterval(interval);
   }, [totalImages]);
 
   const handleBookNow = () => {
-    console.log("Booking initiated!");
+    navigate('/services');
   };
 
-  const goToSlide = (index) => setCurrentImageIndex(index);
+  const handleCreateJob = () => {
+    navigate('/create-job');
+  };
 
   return (
-    <section className="min-h-screen font-['Inter'] flex items-center bg-white overflow-hidden">
-      <div className="w-full px-4 lg:px-0 grid lg:grid-cols-[50%_50%] gap-8 lg:gap-0 items-center">
+    <section className="relative w-full bg-white overflow-hidden pt-6 pb-10 font-['Inter']">
+      <div className="w-full px-4 lg:px-0 grid lg:grid-cols-[42%_58%] items-center">
         
-        {/* Left Column – Content (Clean White Background) */}
-        <div className="flex flex-col justify-center space-y-6 p-6 lg:p-16 xl:max-w-2xl animate-in fade-in slide-in-from-left-8 duration-1000">
+        {/* Left Column – Content */}
+        <div className="flex flex-col justify-center space-y-6 p-6 lg:pl-20 animate-in fade-in slide-in-from-left-8 duration-1000">
           <div className="space-y-2">
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-[1000] leading-[1.1] tracking-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-[1000] leading-[1.05] tracking-tighter">
               <span className="text-gray-900">Home</span> <br/>
               <span className="text-[#008080]">Maintenance</span> <br/>
-              <span className="text-gray-900">Made</span> <span className="text-[#008080]">Easy!!</span>
+              <span className="text-gray-900">Made</span> <span className="text-[#008080]">Simple</span>
             </h1>
           </div>
 
-          <p className="text-lg text-gray-500 max-w-md leading-relaxed">
-            Connecting customers and reliable technicians for quick, safe, and affordable bookings in your local area.
+          <p className="text-base text-gray-500 max-w-sm leading-relaxed font-medium">
+            Connect with verified technicians for quick, safe, and professional home services in your local area.
           </p>
 
-          <div className="flex items-center gap-4 pt-2">
+          {/* Dual Action Buttons */}
+          <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
               onClick={handleBookNow}
-              className="px-10 py-4 bg-[#008080] text-white font-bold rounded-2xl shadow-xl shadow-[#008080]/20 hover:bg-[#006666] transition transform hover:scale-105 active:scale-95"
+              className="flex-1 sm:flex-none px-8 py-4 bg-[#008080] text-white text-[13px] font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-teal-900/10 hover:bg-[#006666] transition-all flex items-center justify-center gap-2 group"
             >
               Book Now
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
 
             <button
-              aria-label="Call for bookings"
-              className="w-14 h-14 flex items-center justify-center bg-white border-2 border-[#008080] text-[#008080] rounded-full shadow-md hover:bg-[#008080] hover:text-white transition-all duration-300"
+              onClick={handleCreateJob}
+              className="flex-1 sm:flex-none px-8 py-4 bg-white border-2 border-gray-900 text-gray-900 text-[13px] font-black uppercase tracking-widest rounded-2xl hover:bg-gray-900 hover:text-white transition-all flex items-center justify-center gap-2"
             >
-              <Phone className="w-6 h-6" />
+              <PlusCircle className="w-4 h-4" />
+              Create Job
             </button>
           </div>
 
-          {/* Search Bar - Modern Style */}
-          <div className="relative mt-6 max-w-lg group">
-            <div className="absolute inset-0 bg-[#008080] blur-lg opacity-5 group-hover:opacity-10 transition-opacity"></div>
-            <div className="relative">
+          {/* Refined Search Bar */}
+          <div className="relative mt-6 max-w-md">
+            <div className="relative group">
               <input
                 type="text"
-                placeholder="Search for services (e.g., Plumber)"
+                placeholder="Find a service (e.g. Plumber, AC Repair)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-14 pr-4 py-5 border-2 border-gray-100 rounded-2xl focus:border-[#008080] transition-all shadow-sm outline-none text-gray-700"
+                className="w-full pl-12 pr-4 py-4.5 border-2 border-gray-100 rounded-2xl focus:border-[#008080] focus:bg-white bg-gray-50 transition-all outline-none text-sm font-semibold text-gray-700"
               />
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#008080] transition-colors" />
             </div>
           </div>
         </div>
 
-        {/* Right Column – Image Slider (The Teal Curved Shape) */}
-        <div className="relative w-full h-[500px] lg:h-[85vh] overflow-hidden animate-in fade-in slide-in-from-right-8 duration-1000">
-          {/* The Teal Viewport with the Rounded Left Side */}
-          <div className="absolute inset-0 bg-[#008080] lg:rounded-l-[400px] overflow-hidden shadow-[-20px_0_40px_rgba(0,0,0,0.05)]">
-            
-            {/* Horizontal Moving Container */}
+        {/* Right Column – Image Slider */}
+        <div className="relative w-full h-[450px] lg:h-[85vh] overflow-hidden animate-in fade-in slide-in-from-right-8 duration-1000">
+          <div className="absolute inset-0 lg:rounded-l-[400px] overflow-hidden bg-gray-100 border-l border-gray-200">
             <div
-              className="flex h-full transition-transform duration-1000 ease-in-out"
+              className="flex h-full transition-transform duration-1000 cubic-bezier(0.4, 0, 0.2, 1)"
               style={{
                 width: `${totalImages * 100}%`,
                 transform: `translateX(-${currentImageIndex * slidePercentage}%)`,
@@ -96,37 +97,19 @@ const HeroSection = () => {
             >
               {sliderImages.map((src, index) => (
                 <div key={index} className="h-full relative" style={{ width: `${slidePercentage}%` }}>
-                   {/* Darker overlay on image for depth */}
-                  <div className="absolute inset-0 bg-black/10 z-10"></div>
                   <img
                     src={src}
                     alt={`Service slide ${index + 1}`}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://placehold.co/900x900/008080/FFFFFF/png?text=SmartRozgar+Service";
-                    }}
                   />
+                  {/* Subtle vignette for a more professional photo look */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
                 </div>
               ))}
             </div>
           </div>
-
-          {/* Navigation Dots Overlayed on the slider */}
-          <div className="absolute bottom-10 left-0 right-0 lg:left-20 flex justify-center lg:justify-start space-x-3 z-20">
-            {sliderImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`h-2 rounded-full transition-all duration-500 ${
-                  index === currentImageIndex 
-                  ? 'w-10 bg-white shadow-lg' 
-                  : 'w-2 bg-white/40 hover:bg-white/70'
-                }`}
-              />
-            ))}*
-          </div>
         </div>
+
       </div>
     </section>
   );

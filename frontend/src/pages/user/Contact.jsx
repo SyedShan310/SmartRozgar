@@ -2,15 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Mail, User, MessageSquareMore, Send, Sparkles, X, Phone } from 'lucide-react';
 import Lottie from 'lottie-react';
 import { useNavigate } from 'react-router-dom';
-
-const simulateSubmission = async (formData) => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return { success: true, message: 'Sent!' };
-};
+import { axiosInstance } from '../../lib/axios';
+import { useAuth } from '../../context/AuthContext';
+import toast from 'react-hot-toast';
 
 export default function Contact() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+    const { user } = useAuth();
+    const [formData, setFormData] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
     const [status, setStatus] = useState({ message: '', type: '', isSubmitting: false });
     const [animationData, setAnimationData] = useState(null);
 
@@ -27,14 +26,20 @@ export default function Contact() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.name || !formData.email || !formData.message) {
-            setStatus({ message: 'Required*', type: 'error' });
+        if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+            setStatus({ message: 'Please fill all required fields', type: 'error' });
             return;
         }
         setStatus({ message: 'Sending...', type: 'info', isSubmitting: true });
-        const result = await simulateSubmission(formData);
-        setStatus({ message: result.message, type: 'success', isSubmitting: false });
-        if (result.success) setFormData({ name: '', email: '', message: '' });
+        try {
+            const endpoint = user ? '/support' : '/support/guest';
+            const res = await axiosInstance.post(endpoint, formData);
+            setStatus({ message: res.data.message || 'Ticket submitted!', type: 'success', isSubmitting: false });
+            toast.success('Support ticket created!');
+            setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+        } catch {
+            setStatus({ message: 'Failed to send. Try again.', type: 'error', isSubmitting: false });
+        }
     };
 
     return (
@@ -112,6 +117,10 @@ export default function Contact() {
                                     </div>
                                 </div>
 
+                                <div className="group">
+                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Subject</label>
+                                    <input type="text" name="subject" value={formData.subject} onChange={handleChange} placeholder="What is this about?" className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-teal-500 mb-3" />
+                                </div>
                                 <div className="group">
                                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Message</label>
                                     <div className="relative">

@@ -14,7 +14,7 @@ const Working = () => {
       id: "02",
       title: "We find the right pro",
       description: "We match you with licensed, vetted, and top-rated professionals in your area within minutes.",
-      image: "https://images.unsplash.com/photo-1581578731117-10452b7bb5af?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+      image: "https://media.istockphoto.com/id/1587604256/photo/portrait-lawyer-and-black-woman-with-tablet-smile-and-happy-in-office-workplace-african.jpg?s=612x612&w=0&k=20&c=n9yulMNKdIYIQC-Qns8agFj6GBDbiKyPRruaUTh4MKs=",
       alt: "Professional cleaners working",
       direction: "reverse"
     },
@@ -22,7 +22,7 @@ const Working = () => {
       id: "03",
       title: "Sit back and relax",
       description: "Track your pro in real-time and enjoy a job well done. Payment is only released when you're happy.",
-      image: "https://images.unsplash.com/photo-1512314889357-e157c22f938d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0c7RvXnuxmgkmBduyZhPsGyY5ytyMn7nxLw&s",
       alt: "Customer relaxing on sofa",
       direction: "normal"
     }

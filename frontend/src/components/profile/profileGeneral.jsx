@@ -67,7 +67,7 @@ const ProfileGeneral = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                     <InfoBox label="Age / Gender" value={`${userData?.age || '25'}, ${userData?.gender || 'Male'}`} />
-                    <InfoBox label="Member Since" value="Jan 2024" />
+                    <InfoBox label="Member Since" value={userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—'} />
                 </div>
                 <InfoBox 
                     label="Current Address" 
@@ -81,8 +81,8 @@ const ProfileGeneral = () => {
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Account Stats</h3>
               <div className="space-y-3">
                 <StatRow label="Bookings" value={userData?.bookedTasks?.length || 0} icon={<Calendar size={16} />} />
-                <StatRow label="Wallet" value={`Rs. ${userData?.walletBalance || 0}`} icon={<Wallet size={16} />} />
-                <StatRow label="Rating" value="4.9 / 5.0" icon={<Star size={16} />} />
+                <StatRow label="Wallet" value={`Rs. ${(userData?.walletBalance || 0).toLocaleString()}`} icon={<Wallet size={16} />} />
+                <StatRow label="Total Spent" value={`Rs. ${(userData?.totalSpent || 0).toLocaleString()}`} icon={<Star size={16} />} />
               </div>
             </div>
           </div>

@@ -1,26 +1,24 @@
-// routes/auth.js
 import bcrypt from 'bcryptjs';
-import Tasker from "../../Models/Tasker.js";
-import Hirer from "../../Models/User.js";
-import express from "express"
+import Tasker from '../../Models/Tasker.js';
+import Hirer  from '../../Models/User.js';
+import { signToken } from '../../middleware/auth.js';
 
-// SINGLE SIGNUP API FOR BOTH HIRER & TASKER
 const signup = async (req, res) => {
   try {
     const {
-      role,                    // 'hirer' or 'tasker' — REQUIRED
+      role,
       fullName,
       phone,
       email,
       password,
       gender,
       age,
-      address,                 // { houseNo, street, landmark, city, state, pincode }
-      skills,                  // Only for tasker
-      hourlyRate               // Only for tasker
+      address,       // { houseNo, street, landmark, city, state, pincode }
+      skills,        // tasker only
+      hourlyRate     // tasker only
     } = req.body;
 
-    // Validation
+    // ── 1. Role validation ───────────────────────────────────────────────────
     if (!role || !['hirer', 'tasker'].includes(role)) {
       return res.status(400).json({
         success: false,
@@ -28,108 +26,130 @@ const signup = async (req, res) => {
       });
     }
 
-    if (!fullName || !phone || !password || !address?.city || !address?.state || !address?.pincode) {
+    // ── 2. Common required fields ────────────────────────────────────────────
+    if (!fullName || !phone || !password || !address?.city || !address?.pincode) {
       return res.status(400).json({
         success: false,
-        message: "Please fill all required fields"
+        message: 'Please fill all required fields (name, phone, password, city, pincode)'
       });
     }
 
-    // Check if phone already exists in BOTH collections
-    const existingHirer = await Hirer.findOne({ phoneNumber: phone });
-    const existingTasker = await Tasker.findOne({ phoneNumber: phone });
+    // ── 3. Tasker-specific required fields ───────────────────────────────────
+    // fixed: these were never validated so missing gender/age hit a confusing 500
+    if (role === 'tasker') {
+      if (!gender || !age) {
+        return res.status(400).json({
+          success: false,
+          message: 'Gender and age are required for tasker accounts'
+        });
+      }
+      if (!skills || skills.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please select at least one skill'
+        });
+      }
+      if (!hourlyRate) {
+        return res.status(400).json({
+          success: false,
+          message: 'Hourly rate is required for tasker accounts'
+        });
+      }
+    }
+
+    // ── 4. Duplicate phone check ─────────────────────────────────────────────
+    const [existingHirer, existingTasker] = await Promise.all([
+      Hirer.findOne({ phoneNumber: phone }),
+      Tasker.findOne({ phoneNumber: phone })
+    ]);
+
     if (existingHirer || existingTasker) {
       return res.status(409).json({
         success: false,
-        message: "Phone number already registered"
+        message: 'Phone number is already registered'
       });
     }
 
-    // Hash password
+    // ── 5. Hash password ─────────────────────────────────────────────────────
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // COMMON FIELDS
+    // ── 6. Build shared fields ───────────────────────────────────────────────
     const commonData = {
       fullName,
-      phoneNumber: phone,
-      email: email || null,
-      password: hashedPassword,
-      gender: gender || null,
-      age: age ? parseInt(age) : null,
+      phoneNumber:  phone,
+      email:        email  || null,
+      password:     hashedPassword,
+      gender:       gender || null,
+      age:          age    ? parseInt(age) : null,
       address: [{
-        houseNo: address.houseNo || "",
-        street: address.street || "",
-        landmark: address.landmark || "",
-        city: address.city,
-        state: address.state,
-        pincode: address.pincode,
+        houseNo:   address.houseNo  || '',
+        street:    address.street   || '',
+        landmark:  address.landmark || '',
+        city:      address.city,
+        state:     address.state    || '',
+        pincode:   address.pincode,
         isDefault: true
       }],
-      isPhoneVerified: false,
+      isPhoneVerified:   false,
       isProfileComplete: false
     };
 
+    // ── 7. Create user ───────────────────────────────────────────────────────
     let user;
     let message;
 
     if (role === 'hirer') {
-      // CREATE HIRER
       user = await Hirer.create({
         ...commonData,
-        totalSpent: 0,
+        totalSpent:    0,
         walletBalance: 0
       });
-      message = "Hirer account created successfully!";
+      message = 'Hirer account created successfully!';
 
-    } else if (role === 'tasker') {
-      // CREATE TASKER
-      if (!skills || skills.length === 0) {
-        return res.status(400).json({
-          success: false,
-          message: "Please select at least one skill"
-        });
-      }
-
+    } else {
       user = await Tasker.create({
         ...commonData,
         skills,
-        hourlyRate: parseInt(hourlyRate) || 0,
+        hourlyRate:    parseInt(hourlyRate),
         totalEarnings: 0,
-        jobsCount: 0,
-        rating: { average: 0, count: 0 },
-        isApproved: false,        // Admin must approve
-        isActive: true
+        jobsCount:     0,
+        rating:        { average: 0, count: 0 },
+        isApproved:    false,
+        isActive:      true
       });
-      message = "Tasker account created! Waiting for admin approval.";
+      message = 'Tasker account created! Pending admin approval.';
     }
 
-    // SUCCESS RESPONSE
-    res.status(201).json({
+    // ── 8. Success response ──────────────────────────────────────────────────
+    const token = signToken({ id: user._id, role });
+    return res.status(201).json({
       success: true,
       message,
+      token,
       user: {
-        id: user._id,
-        fullName: user.fullName,
-        phone: user.phoneNumber,
-        role: role,
+        id:         user._id,
+        fullName:   user.fullName,
+        phone:      user.phoneNumber,
+        role,
         isApproved: role === 'tasker' ? user.isApproved : true
       }
     });
 
   } catch (error) {
-    console.error("Signup Error:", error);
+    console.error('Signup Error:', error);
 
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
-        message: "Phone number already exists"
+        message: 'Phone number already exists'
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Server error. Please try again later."
+      message: 'Server error. Please try again later.'
     });
   }
 };
+
 export default signup;

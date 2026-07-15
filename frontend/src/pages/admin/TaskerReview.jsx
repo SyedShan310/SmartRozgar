@@ -1,133 +1,146 @@
-import React from 'react';
-import { 
-  CheckCircle, XCircle, Eye, FileText, UserCheck, 
-  MapPin, Star, Clock, AlertCircle, ExternalLink, ShieldAlert
+import React, { useEffect, useState } from 'react';
+import {
+  MapPin, AlertCircle, UserCheck, ShieldAlert, Loader2, Briefcase
 } from 'lucide-react';
-
-const pendingTaskers = [
-    { 
-        id: 'APP-101', 
-        name: 'Alex Rivera', 
-        category: 'Electrical & Plumbing', 
-        location: 'New York, NY', 
-        appliedDate: 'Oct 24, 2025',
-        docs: ['ID Card', 'Electrician License'],
-        status: 'Reviewing'
-    },
-    { 
-        id: 'APP-102', 
-        name: 'Jordan Smith', 
-        category: 'General Cleaning', 
-        location: 'Austin, TX', 
-        appliedDate: 'Oct 25, 2025',
-        docs: ['Identity Proof'],
-        status: 'New'
-    },
-    { 
-        id: 'APP-103', 
-        name: 'Sarah Connor', 
-        category: 'Personal Assistant', 
-        location: 'Los Angeles, CA', 
-        appliedDate: 'Oct 25, 2025',
-        docs: ['Resume', 'Background Check'],
-        status: 'New'
-    }
-];
+import { axiosInstance } from '../../lib/axios';
+import toast from 'react-hot-toast';
 
 const AdminTaskerReview = () => {
-    return (
-        <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 className="text-2xl font-bold text-white">Tasker Applications</h1>
-                    <p className="text-sm text-slate-500 mt-1">Review and approve new service providers to maintain platform quality.</p>
-                </div>
-                <div className="flex gap-3">
-                    <div className="bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-lg flex items-center gap-2">
-                        <AlertCircle size={16} className="text-amber-500" />
-                        <span className="text-sm font-bold text-amber-500">12 Pending Reviews</span>
-                    </div>
-                </div>
-            </div>
+  const [taskers, setTaskers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actionId, setActionId] = useState(null);
 
-            {/* Application Cards Grid */}
-            <div className="grid grid-cols-1 gap-4">
-                {pendingTaskers.map((app) => (
-                    <div key={app.id} className="bg-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden hover:border-white/10 transition-all group">
-                        <div className="flex flex-col lg:flex-row">
-                            
-                            {/* Left: Basic Info */}
-                            <div className="p-6 lg:w-1/3 border-b lg:border-b-0 lg:border-r border-white/5">
-                                <div className="flex items-center gap-4 mb-4">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xl font-black">
-                                        {app.name.charAt(0)}
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">{app.name}</h3>
-                                        <p className="text-xs text-slate-500 flex items-center gap-1">
-                                            <MapPin size={12} /> {app.location}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-xs">
-                                        <span className="text-slate-500 font-medium uppercase tracking-tighter">Applied on</span>
-                                        <span className="text-slate-300 font-bold">{app.appliedDate}</span>
-                                    </div>
-                                    <div className="flex justify-between text-xs">
-                                        <span className="text-slate-500 font-medium uppercase tracking-tighter">Category</span>
-                                        <span className="text-emerald-500 font-bold">{app.category}</span>
-                                    </div>
-                                </div>
-                            </div>
+  const fetchPending = async () => {
+    try {
+      const res = await axiosInstance.get('/admin/taskers/pending');
+      if (res.data.success) setTaskers(res.data.taskers);
+    } catch {
+      toast.error('Failed to load applications');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                            {/* Middle: Document Checklist */}
-                            <div className="p-6 lg:w-1/3 border-b lg:border-b-0 lg:border-r border-white/5 bg-white/[0.01]">
-                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Verification Documents</h4>
-                                <div className="space-y-3">
-                                    {app.docs.map((doc, i) => (
-                                        <div key={i} className="flex items-center justify-between bg-white/5 p-2 rounded-lg border border-white/5">
-                                            <div className="flex items-center gap-2">
-                                                <FileText size={14} className="text-slate-400" />
-                                                <span className="text-xs text-white font-medium">{doc}</span>
-                                            </div>
-                                            <button className="text-indigo-400 hover:text-indigo-300 p-1">
-                                                <ExternalLink size={14} />
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+  useEffect(() => { fetchPending(); }, []);
 
-                            {/* Right: Actions */}
-                            <div className="p-6 lg:w-1/3 flex flex-col justify-center gap-3">
-                                <div className="flex items-center justify-center gap-2 mb-2">
-                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
-                                        app.status === 'New' ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'
-                                    }`}>
-                                        {app.status} Status
-                                    </span>
-                                </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <button className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
-                                        <UserCheck size={16} /> Approve
-                                    </button>
-                                    <button className="flex items-center justify-center gap-2 bg-white/5 hover:bg-red-500/10 border border-white/10 text-slate-400 hover:text-red-500 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
-                                        <ShieldAlert size={16} /> Reject
-                                    </button>
-                                </div>
-                                <button className="w-full text-center text-[10px] font-bold text-slate-500 hover:text-white uppercase mt-2">
-                                    View Full Profile Details
-                                </button>
-                            </div>
+  const handleApprove = async (id) => {
+    setActionId(id);
+    try {
+      const res = await axiosInstance.patch(`/admin/taskers/${id}/approve`);
+      if (res.data.success) {
+        toast.success('Tasker approved!');
+        fetchPending();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to approve');
+    } finally {
+      setActionId(null);
+    }
+  };
 
-                        </div>
-                    </div>
-                ))}
-            </div>
+  const handleReject = async (id) => {
+    if (!confirm('Reject this application?')) return;
+    setActionId(id);
+    try {
+      const res = await axiosInstance.delete(`/admin/taskers/${id}/reject`);
+      if (res.data.success) {
+        toast.success('Application rejected');
+        fetchPending();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to reject');
+    } finally {
+      setActionId(null);
+    }
+  };
+
+  if (loading) return (
+    <div className="flex justify-center py-20"><Loader2 className="animate-spin text-teal-600" size={32} /></div>
+  );
+
+  return (
+    <div className="animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Tasker Applications</h1>
+          <p className="text-sm font-medium text-slate-500 mt-1">Approve new service providers so they can log in and accept jobs.</p>
         </div>
-    );
+        <div className="bg-amber-50 border border-amber-200 px-4 py-2 rounded-xl flex items-center gap-2">
+          <AlertCircle size={16} className="text-amber-600" />
+          <span className="text-xs font-black text-amber-600 uppercase">{taskers.length} Pending</span>
+        </div>
+      </div>
+
+      {taskers.length === 0 ? (
+        <div className="bg-white border border-dashed border-slate-200 rounded-2xl p-16 text-center">
+          <UserCheck size={40} className="text-teal-300 mx-auto mb-4" />
+          <p className="font-black text-slate-600">All caught up — no pending applications</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6">
+          {taskers.map((t) => (
+            <div key={t._id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg transition-all shadow-sm">
+              <div className="flex flex-col lg:flex-row">
+                <div className="p-6 lg:w-2/5 border-b lg:border-b-0 lg:border-r border-slate-100">
+                  <div className="flex items-center gap-4 mb-4">
+                    <img src={t.profilePicture} className="w-14 h-14 rounded-2xl object-cover border border-slate-100" alt="" />
+                    <div>
+                      <h3 className="text-lg font-black text-slate-800">{t.fullName}</h3>
+                      <p className="text-xs font-bold text-slate-400 flex items-center gap-1">
+                        <MapPin size={12} /> {t.address?.[0]?.city || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-[10px] uppercase tracking-widest">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400 font-bold">Phone</span>
+                      <span className="text-slate-700 font-black">{t.phoneNumber}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400 font-bold">Rate</span>
+                      <span className="text-teal-600 font-black">Rs. {t.hourlyRate}/hr</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400 font-bold">Applied</span>
+                      <span className="text-slate-700 font-black">{new Date(t.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 lg:w-2/5 border-b lg:border-b-0 lg:border-r border-slate-100 bg-slate-50/30">
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                    <Briefcase size={12} /> Skills
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {t.skills?.map((s) => (
+                      <span key={s} className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-[10px] font-black text-slate-600 uppercase">{s}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-6 lg:w-1/5 flex flex-col justify-center gap-3">
+                  <button
+                    onClick={() => handleApprove(t._id)}
+                    disabled={actionId === t._id}
+                    className="flex items-center justify-center gap-2 bg-[#0D9488] hover:bg-teal-700 text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
+                  >
+                    {actionId === t._id ? <Loader2 size={14} className="animate-spin" /> : <UserCheck size={16} />} Approve
+                  </button>
+                  <button
+                    onClick={() => handleReject(t._id)}
+                    disabled={actionId === t._id}
+                    className="flex items-center justify-center gap-2 bg-white border border-rose-200 text-rose-500 hover:bg-rose-50 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest"
+                  >
+                    <ShieldAlert size={16} /> Reject
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default AdminTaskerReview;

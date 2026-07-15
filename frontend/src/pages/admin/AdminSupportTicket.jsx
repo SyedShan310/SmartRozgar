@@ -1,130 +1,112 @@
-import React from 'react';
-import { 
-  MessageSquare, Search, Filter, Clock, CheckCircle2, 
-  AlertCircle, MoreVertical, Send, User, MessageCircle,
-  Paperclip, ShieldAlert
-} from 'lucide-react';
-
-const ticketData = [
-    { id: 'TKT-1024', user: 'Danna Williams', role: 'Tasker', subject: 'Payment not received', priority: 'High', status: 'Open', date: '10 mins ago' },
-    { id: 'TKT-1025', user: 'Sarah Johnson', role: 'Client', subject: 'Incomplete task dispute', priority: 'Urgent', status: 'In Progress', date: '1 hour ago' },
-    { id: 'TKT-1026', user: 'Michael Chen', role: 'Tasker', subject: 'Account verification help', priority: 'Medium', status: 'Open', date: '3 hours ago' },
-    { id: 'TKT-1027', user: 'Robert Wilson', role: 'Client', subject: 'App crashing on checkout', priority: 'Low', status: 'Closed', date: '1 day ago' },
-];
+import React, { useEffect, useState } from 'react';
+import { Search, CheckCircle2, Loader2, Send } from 'lucide-react';
+import { axiosInstance } from '../../lib/axios';
+import toast from 'react-hot-toast';
 
 const AdminSupportTickets = () => {
-    return (
-        <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 className="text-2xl font-bold text-white">Support Center</h1>
-                    <p className="text-sm text-slate-500 mt-1">Resolve user disputes, technical issues, and platform inquiries.</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-lg flex items-center gap-2">
-                        <ShieldAlert size={16} className="text-red-500" />
-                        <span className="text-sm font-bold text-red-500">3 Urgent Disputes</span>
-                    </div>
-                </div>
-            </div>
+  const [tickets, setTickets] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [reply, setReply] = useState('');
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                
-                {/* Left: Ticket List */}
-                <div className="lg:col-span-5 space-y-4">
-                    <div className="bg-[#0a0a0a] border border-white/5 rounded-xl p-4 flex gap-2">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-                            <input type="text" placeholder="Search tickets..." className="w-full bg-white/5 border border-white/10 rounded-lg py-2 pl-9 pr-4 text-xs text-white focus:outline-none focus:border-indigo-500" />
-                        </div>
-                        <button className="bg-white/5 border border-white/10 p-2 rounded-lg text-slate-400 hover:text-white transition-colors">
-                            <Filter size={18} />
-                        </button>
-                    </div>
+  const fetchTickets = async () => {
+    try {
+      const res = await axiosInstance.get('/support');
+      if (res.data.success) {
+        setTickets(res.data.tickets);
+        if (res.data.tickets.length > 0 && !selected) setSelected(res.data.tickets[0]);
+      }
+    } catch { toast.error('Failed to load tickets'); }
+    finally { setLoading(false); }
+  };
 
-                    <div className="space-y-3 overflow-y-auto max-h-[600px] pr-2 custom-scrollbar">
-                        {ticketData.map((tkt) => (
-                            <div key={tkt.id} className="bg-[#0a0a0a] border border-white/5 rounded-xl p-4 hover:border-indigo-500/30 transition-all cursor-pointer group">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className="text-[10px] font-mono text-indigo-400 font-bold">{tkt.id}</span>
-                                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
-                                        tkt.priority === 'Urgent' ? 'bg-red-500 text-white' : 
-                                        tkt.priority === 'High' ? 'bg-orange-500/20 text-orange-500' : 'bg-blue-500/20 text-blue-500'
-                                    }`}>
-                                        {tkt.priority}
-                                    </span>
-                                </div>
-                                <h3 className="text-sm font-bold text-white mb-1 group-hover:text-indigo-400 transition-colors">{tkt.subject}</h3>
-                                <div className="flex items-center justify-between mt-4">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white">
-                                            {tkt.user.charAt(0)}
-                                        </div>
-                                        <span className="text-[11px] text-slate-400">{tkt.user}</span>
-                                    </div>
-                                    <span className="text-[10px] text-slate-600 font-medium">{tkt.date}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+  useEffect(() => { fetchTickets(); }, []);
 
-                {/* Right: Conversation View */}
-                <div className="lg:col-span-7 flex flex-col bg-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden min-h-[600px]">
-                    {/* Chat Header */}
-                    <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold">SJ</div>
-                            <div>
-                                <h3 className="text-sm font-bold text-white">Sarah Johnson</h3>
-                                <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest">Client • Online</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <button className="text-slate-500 hover:text-white p-2 transition-colors"><CheckCircle2 size={20}/></button>
-                            <button className="text-slate-500 hover:text-red-500 p-2 transition-colors"><AlertCircle size={20}/></button>
-                        </div>
-                    </div>
+  const updateTicket = async (id, updates) => {
+    try {
+      const res = await axiosInstance.patch(`/support/${id}`, updates);
+      if (res.data.success) {
+        toast.success('Ticket updated');
+        fetchTickets();
+        setSelected(res.data.ticket);
+        setReply('');
+      }
+    } catch { toast.error('Update failed'); }
+  };
 
-                    {/* Chat Messages */}
-                    <div className="flex-1 p-6 space-y-6 overflow-y-auto max-h-[400px]">
-                        <div className="flex gap-3 max-w-[80%]">
-                            <div className="w-8 h-8 rounded-full bg-white/10 flex-shrink-0 flex items-center justify-center"><User size={14}/></div>
-                            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-tl-none">
-                                <p className="text-sm text-slate-300">The tasker didn't complete the cleaning in the kitchen as promised. I'd like to dispute the final payment.</p>
-                                <span className="text-[9px] text-slate-600 mt-2 block font-bold">1:15 PM</span>
-                            </div>
-                        </div>
+  const filtered = tickets.filter((t) =>
+    t.subject?.toLowerCase().includes(search.toLowerCase()) ||
+    t.name?.toLowerCase().includes(search.toLowerCase())
+  );
 
-                        <div className="flex gap-3 max-w-[80%] ml-auto flex-row-reverse">
-                            <div className="w-8 h-8 rounded-full bg-indigo-600 flex-shrink-0 flex items-center justify-center"><User size={14}/></div>
-                            <div className="bg-indigo-600 p-4 rounded-2xl rounded-tr-none">
-                                <p className="text-sm text-white">Hello Sarah, I'm reviewing the photos now. Please wait while I contact the tasker for their version of the event.</p>
-                                <span className="text-[9px] text-indigo-200 mt-2 block font-bold">1:20 PM • Seen</span>
-                            </div>
-                        </div>
-                    </div>
+  const priorityColor = { urgent: 'text-red-600 bg-red-50', high: 'text-orange-600 bg-orange-50', medium: 'text-blue-600 bg-blue-50', low: 'text-slate-500 bg-slate-50' };
 
-                    {/* Chat Input */}
-                    <div className="p-4 bg-white/[0.02] border-t border-white/5">
-                        <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-2 focus-within:border-indigo-500 transition-all">
-                            <button className="p-2 text-slate-500 hover:text-white transition-colors"><Paperclip size={18}/></button>
-                            <input 
-                                type="text" 
-                                placeholder="Type your response to the user..." 
-                                className="flex-1 bg-transparent border-none text-sm text-white focus:outline-none" 
-                            />
-                            <button className="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-lg transition-all shadow-lg shadow-indigo-600/20">
-                                <Send size={18} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
+  if (loading) return (
+    <div className="flex justify-center py-20"><Loader2 className="animate-spin text-teal-600" size={32} /></div>
+  );
 
-            </div>
+  return (
+    <div className="animate-in fade-in duration-500">
+      <div className="mb-8">
+        <h1 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Support Center</h1>
+        <p className="text-sm text-slate-500 mt-1">{tickets.filter((t) => t.status === 'open').length} open tickets</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-5 space-y-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search tickets..." className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-teal-500" />
+          </div>
+          {filtered.map((t) => (
+            <button key={t._id} onClick={() => setSelected(t)} className={`w-full text-left bg-white border rounded-2xl p-4 transition-all ${selected?._id === t._id ? 'border-teal-500 shadow-md' : 'border-slate-200 hover:border-teal-200'}`}>
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-[10px] font-black text-slate-400">{t.ticketId}</span>
+                <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-lg ${priorityColor[t.priority] || priorityColor.medium}`}>{t.priority}</span>
+              </div>
+              <p className="text-sm font-bold text-slate-800">{t.subject}</p>
+              <p className="text-[10px] text-slate-400 mt-1">{t.name} · {new Date(t.createdAt).toLocaleDateString()}</p>
+            </button>
+          ))}
+          {filtered.length === 0 && <p className="text-center py-8 text-sm text-slate-400">No tickets</p>}
         </div>
-    );
+
+        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          {selected ? (
+            <div className="space-y-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-lg font-black text-slate-800">{selected.subject}</h2>
+                  <p className="text-xs text-slate-400">{selected.name} · {selected.email} · {selected.userRole}</p>
+                </div>
+                <span className="text-[10px] font-black uppercase px-3 py-1 rounded-lg bg-slate-100 text-slate-600">{selected.status}</span>
+              </div>
+              <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-600">{selected.message}</div>
+              {selected.adminReply && (
+                <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 text-sm text-teal-800">
+                  <p className="text-[10px] font-black uppercase mb-1">Admin Reply</p>
+                  {selected.adminReply}
+                </div>
+              )}
+              <textarea rows={3} value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Write a reply..." className="w-full border border-slate-200 rounded-xl p-3 text-sm outline-none focus:border-teal-500" />
+              <div className="flex gap-2">
+                <button onClick={() => updateTicket(selected._id, { adminReply: reply, status: 'in-progress' })} className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white text-[10px] font-black uppercase rounded-xl">
+                  <Send size={12} /> Reply
+                </button>
+                <button onClick={() => updateTicket(selected._id, { status: 'resolved' })} className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-black uppercase rounded-xl">
+                  <CheckCircle2 size={12} /> Resolve
+                </button>
+                <button onClick={() => updateTicket(selected._id, { status: 'closed' })} className="px-4 py-2 bg-slate-100 text-slate-600 text-[10px] font-black uppercase rounded-xl">Close</button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-center py-16 text-slate-400 text-sm">Select a ticket</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default AdminSupportTickets;

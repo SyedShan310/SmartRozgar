@@ -12,7 +12,7 @@ import Working from "../../components/home/Working"
 const Home = () => {
   return (
     <>
-   <Navbar/>
+   {/* <Navbar/> */}
     <HeroSection/>
     <Services/>
     <TrendingServicesSection/>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { axiosInstance } from '../../lib/axios';
 import { 
   User, Lock, Bell, Shield, 
   Mail, Phone, MapPin, Save, 
@@ -10,23 +11,39 @@ import {
 import toast from 'react-hot-toast';
 
 const AccountSettings = () => {
-  const { userData } = useOutletContext();
-  const [activeTab, setActiveTab] = useState('personal'); 
+  const { userData, refetchProfile } = useOutletContext();
+  const [activeTab, setActiveTab] = useState('personal');
   const [showPassword, setShowPassword] = useState(false);
-  const [is2FA, setIs2FA] = useState(true);
+  const [form, setForm] = useState({ fullName: '', email: '', phoneNumber: '' });
+  const [passwords, setPasswords] = useState({ current: '', new: '' });
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = (e) => {
+  React.useEffect(() => {
+    if (userData) setForm({ fullName: userData.fullName || '', email: userData.email || '', phoneNumber: userData.phoneNumber || '' });
+  }, [userData]);
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    toast.success(`${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Updated Successfully`, {
-      style: { 
-        background: '#ffffff',
-        color: '#0f172a',
-        border: '1px solid #e2e8f0',
-        fontSize: '12px',
-        fontWeight: '600',
-        borderRadius: '12px'
+    setSaving(true);
+    try {
+      const res = await axiosInstance.put(`/user/${userData._id}`, form);
+      if (res.data.success) {
+        refetchProfile?.();
+        toast.success('Profile updated!');
       }
-    });
+    } catch { toast.error('Failed to save'); }
+    finally { setSaving(false); }
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await axiosInstance.patch('/auth/password', { currentPassword: passwords.current, newPassword: passwords.new });
+      toast.success('Password updated!');
+      setPasswords({ current: '', new: '' });
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
+    finally { setSaving(false); }
   };
 
   const renderTabContent = () => {
@@ -44,14 +61,13 @@ const AccountSettings = () => {
               
               <form onSubmit={handleSave} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InputGroup label="Full Name" placeholder="Danna Williams" defaultValue={userData?.fullName} icon={<User size={16}/>} />
-                  <InputGroup label="Email Address" placeholder="danna@example.com" defaultValue={userData?.email} icon={<Mail size={16}/>} />
-                  <InputGroup label="Phone Number" placeholder="+92 300 1234567" defaultValue={userData?.phoneNumber} icon={<Phone size={16}/>} />
-                  <InputGroup label="Location" placeholder="Lahore, Pakistan" icon={<MapPin size={16}/>} />
+                  <InputGroup label="Full Name" name="fullName" value={form.fullName} onChange={(e) => setForm({...form, fullName: e.target.value})} icon={<User size={16}/>} />
+                  <InputGroup label="Email Address" name="email" value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} icon={<Mail size={16}/>} />
+                  <InputGroup label="Phone Number" name="phoneNumber" value={form.phoneNumber} readOnly icon={<Phone size={16}/>} />
                 </div>
                 <div className="pt-6 border-t border-gray-50 flex justify-end">
-                  <button type="submit" className="px-8 py-3 bg-teal-600 text-white rounded-xl text-sm font-bold hover:bg-teal-700 transition-all flex items-center gap-2 shadow-lg shadow-teal-100">
-                    <Save size={18}/> Save Changes
+                  <button type="submit" disabled={saving} className="px-8 py-3 bg-teal-600 text-white rounded-xl text-sm font-bold hover:bg-teal-700 transition-all flex items-center gap-2 shadow-lg shadow-teal-100 disabled:opacity-50">
+                    <Save size={18}/> {saving ? 'Saving...' : 'Save Changes'}
                   </button>
                 </div>
               </form>
@@ -70,45 +86,15 @@ const AccountSettings = () => {
                 <h3 className="font-bold text-slate-900 text-lg">Security Settings</h3>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-                <div className="relative">
-                   <InputGroup 
-                      label="New Password" 
-                      type={showPassword ? "text" : "password"} 
-                      placeholder="••••••••" 
-                      icon={<Lock size={16}/>} 
-                   />
-                   <button 
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-[42px] text-gray-400 hover:text-teal-600"
-                   >
-                     {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
-                   </button>
-                </div>
-                <button onClick={handleSave} className="h-[52px] bg-slate-50 border border-gray-100 text-slate-600 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-100 transition-all">
-                  Update Password
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                <InputGroup label="Current Password" type={showPassword ? 'text' : 'password'} value={passwords.current} onChange={(e) => setPasswords({ ...passwords, current: e.target.value })} icon={<Lock size={16}/>} />
+                <InputGroup label="New Password" type={showPassword ? 'text' : 'password'} value={passwords.new} onChange={(e) => setPasswords({ ...passwords, new: e.target.value })} icon={<Lock size={16}/>} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-xs text-teal-600 font-bold">{showPassword ? 'Hide' : 'Show'} passwords</button>
+                <button type="submit" disabled={saving} className="px-8 py-3 bg-teal-600 text-white rounded-xl text-sm font-bold disabled:opacity-50">
+                  {saving ? 'Updating...' : 'Update Password'}
                 </button>
-              </div>
+              </form>
             </section>
-
-            <div className={`p-6 border rounded-[2rem] flex items-center justify-between transition-all ${is2FA ? 'bg-teal-50 border-teal-100' : 'bg-white border-gray-100'}`}>
-              <div className="flex items-center gap-4">
-                <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${is2FA ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
-                  <Shield size={22} />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-900">Two-Factor Authentication</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Secure your account with OTP verification</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setIs2FA(!is2FA)}
-                className={`w-12 h-6 rounded-full relative transition-all shadow-inner ${is2FA ? 'bg-teal-600' : 'bg-gray-200'}`}
-              >
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${is2FA ? 'right-1' : 'left-1'}`}></div>
-              </button>
-            </div>
           </div>
         );
 
